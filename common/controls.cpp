@@ -111,7 +111,7 @@ void computeMatricesFromInputs(){
 		verticalAngle -= speed * deltaTime;
 	}
 
-	printf("Position: (%f, %f, %f). horizontalAngle: (%f)\n", position.x, position.y, position.z, horizontalAngle);
+	// printf("Position: (%f, %f, %f). horizontalAngle: (%f)\n", position.x, position.y, position.z, horizontalAngle);
 
 	float FoV = initialFoV;// - 5 * glfwGetMouseWheel(); // Now GLFW 3 requires setting up a callback for this. It's a bit too complicated for this beginner's tutorial, so it's disabled instead.
 

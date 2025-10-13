@@ -90,7 +90,7 @@ int main( void )
 	// Accept fragment if it is closer to the camera than the former one
 	glDepthFunc(GL_LESS); 
 	// Cull triangles which normal is not towards the camera - Do not process triangles we can't see
-	glEnable(GL_CULL_FACE);
+	// glEnable(GL_CULL_FACE);
 
 	// 7) Create and bind a Vertax Array Object (VAO) - Configuration of a single piece of geometry
 	GLuint VertexArrayID;
@@ -147,21 +147,27 @@ int main( void )
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0] , GL_STATIC_DRAW);
 
-	// 12) Add our rectangle, using the same shader
-	static const GLfloat g_vertex_buffer_data[] =
-	{
-		-10.0f, 0.0f, -10.0f,
-		10.0f,  0.0f, -10.0f,
-		10.0f,  0.0f,  10.0f,
+	// 12) Add our rectangle
+	float rectSize = 4.0f;
+	float yPos = -1.0f;
+	static const GLfloat rectVertexData[] = {
+		-rectSize, yPos, -rectSize,
+		rectSize,  yPos,  rectSize,
+		-rectSize, yPos,  rectSize,
 
-		-10.0f, 0.0f, -10.0f,
-		10.0f,  0.0f,  10.0f,
-		-10.0f, 0.0f,  10.0f,
+		-rectSize, yPos, -rectSize,
+		rectSize,  yPos, -rectSize,
+		rectSize,  yPos,  rectSize,
 	};
 	GLuint rectVertexBuffer;
 	glGenBuffers(1, &rectVertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, rectVertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(rectVertexData), rectVertexData, GL_STATIC_DRAW);
+
+	//Create uniform color shader for the rectangle
+	GLuint colorUniform = glGetUniformLocation(programID, "uColor");
+	glUseProgram(programID);
+	glUniform3f(colorUniform, 0.0f, 1.0f, 0.0f);
 
 	// 13) Cache light uniform and initialize timer - Add light to shader (programID)
 	// Get a handle for our "LightPosition" uniform
@@ -336,8 +342,20 @@ int main( void )
 
 		////// Start of rendering of the rectangle //////
 		{
+			// 1) Set uColor to green
+			glUniform3f(colorUniform, 0.0f, 1.0f, 0.0f);
+
+			// 2) Set Model and MVP matrices - Set position to the origin
+			glm::mat4 ModelMatrixRect = glm::mat4(1.0);
+			glm::mat4 MVPRect = ProjectionMatrix * ViewMatrix * ModelMatrixRect;
+			glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVPRect[0][0]);
+			glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrixRect[0][0]);
+
+			// 3) Add verticies
 			glBindBuffer(GL_ARRAY_BUFFER, rectVertexBuffer);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+			// 4) Draw it
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
 
