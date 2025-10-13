@@ -83,8 +83,8 @@ void computeMatricesFromInputs(){
 		position -= direction * deltaTime * speed;
 	}
 
-	// Rotate camera left, maintaining radial distance from origin
-	if (glfwGetKey (window, GLFW_KEY_A ) == GLFW_PRESS) {
+	// Rotate camera right, maintaining radial distance from origin
+	if (glfwGetKey (window, GLFW_KEY_D ) == GLFW_PRESS) {
 		//Angle the camera
 		horizontalAngle += angularSpeed * deltaTime;
 
@@ -92,8 +92,8 @@ void computeMatricesFromInputs(){
 		position.x = radius * glm::sin(horizontalAngle - 3.14f);
 		position.z = radius * glm::cos(horizontalAngle - 3.14f);
 	}
-	// Rotate camera right, maintaining radial distance from origin
-	if (glfwGetKey (window, GLFW_KEY_D ) == GLFW_PRESS) {
+	// Rotate camera left, maintaining radial distance from origin
+	if (glfwGetKey (window, GLFW_KEY_A ) == GLFW_PRESS) {
 		//Angle the camera
 		horizontalAngle -= angularSpeed * deltaTime;
 
