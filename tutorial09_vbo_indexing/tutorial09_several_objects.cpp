@@ -168,8 +168,7 @@ int main( void )
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-		// Compute the MVP matrix from keyboard and mouse input
+		// 1) Compute the MVP matrix from keyboard and mouse input
 		computeMatricesFromInputs();
 		glm::mat4 ProjectionMatrix = getProjectionMatrix();
 		glm::mat4 ViewMatrix = getViewMatrix();
@@ -177,40 +176,40 @@ int main( void )
 
 		////// Start of rendering of the rectangle //////
 		{
-			float vertices[] = {
-				0.5f,  0.5f, 0.0f,
-				0.5f, -0.5f, 0.0f,
-				-0.5f, -0.5f, 0.0f,
-				-0.5f,  0.5f, 0.0f
-			};
 		}
 		
 		
 		////// Start of the rendering of the first object //////
 		{
-			// Use our shader
+			// 2) Use our shader and set globals to be used by all objects
+			// Set light position and view matrix once before drawing objects
 			glUseProgram(programID);
-		
 			glm::vec3 lightPos = glm::vec3(4,4,4);
 			glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
 			glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]); // This one doesn't change between objects, so this can be done once for all objects that use "programID"
 			
+			// 3) For each object, build Model and MVP
+			// Each object has its own model transform, MVP = Projection * View * Model, and uploads MVP and Model to shader
 			glm::mat4 ModelMatrix1 = glm::mat4(1.0);
+			float angle = glm::radians(0.0f);
+			ModelMatrix1 = glm::translate(ModelMatrix1, glm::vec3(3*glm::sin(angle), 0, 3*glm::cos(angle)));
+			ModelMatrix1 = glm::rotate(ModelMatrix1, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 			glm::mat4 MVP1 = ProjectionMatrix * ViewMatrix * ModelMatrix1;
 
-			// Send our transformation to the currently bound shader, 
-			// in the "MVP" uniform
+			// 4) Send Model and MVP to our shader
+			// Send our transformation to the currently bound shader, in the "MVP" uniform
 			glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP1[0][0]);
 			glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix1[0][0]);
 
-
+			// 5) Bind textures and set sampler
 			// Bind our texture in Texture Unit 0
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, Texture);
 			// Set our "myTextureSampler" sampler to use Texture Unit 0
 			glUniform1i(TextureID, 0);
 
-			// 1rst attribute buffer : vertices
+			// 6) Enable vertex attributes and bind VBOs/IBO
+			// 1st attribute buffer : vertices
 			glEnableVertexAttribArray(0);
 			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 			glVertexAttribPointer(
@@ -249,7 +248,7 @@ int main( void )
 			// Index buffer
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 
-			// Draw the triangles !
+			// 7) Draw the triangles !
 			glDrawElements(
 				GL_TRIANGLES,      // mode
 				indices.size(),    // count
@@ -259,8 +258,7 @@ int main( void )
 
 		}
 		////// End of rendering of the first object //////
-		////// Start of the rendering of the second object //////
-		{
+		auto renderSuzzane = [&](float angleDegrees) {
 			// In our very specific case, the 2 objects use the same shader.
 			// So it's useless to re-bind the "programID" shader, since it's already the current one.
 			//glUseProgram(programID);
@@ -278,52 +276,18 @@ int main( void )
 			//glBindTexture(GL_TEXTURE_2D, Texture);
 			//// Set our "myTextureSampler" sampler to use Texture Unit 0
 			//glUniform1i(TextureID, 0);
-			
-			
-			// BUT the Model matrix is different (and the MVP too)
-			glm::mat4 ModelMatrix2 = glm::mat4(1.0);
-			ModelMatrix2 = glm::translate(ModelMatrix2, glm::vec3(2.0f, 0.0f, 0.0f));
-			glm::mat4 MVP2 = ProjectionMatrix * ViewMatrix * ModelMatrix2;
-
-			// Send our transformation to the currently bound shader, 
-			// in the "MVP" uniform
-			glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP2[0][0]);
-			glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix2[0][0]);
 
 
-			// The rest is exactly the same as the first object
-			
-			// 1rst attribute buffer : vertices
-			glEnableVertexAttribArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-			// 2nd attribute buffer : UVs
-			glEnableVertexAttribArray(1);
-			glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-			// 3rd attribute buffer : normals
-			glEnableVertexAttribArray(2);
-			glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
-			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-			// Index buffer
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-
-			// Draw the triangles !
-			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, (void*)0);
-		}
-		////// End of rendering of the second object //////
-		////// Start of rendering of the third object //////
-		{
-			glm::mat4 ModelMatrix3 = glm::mat4(1.0);
-			ModelMatrix3 = glm::translate(ModelMatrix3, glm::vec3(4.0f, 0.0f, 0.0f));
-			glm::mat4 MVP3 = ProjectionMatrix * ViewMatrix * ModelMatrix3;
+			// 1) Set Model and MVP matrices
+			glm::mat4 ModelMatrix = glm::mat4(1.0);
+			float angle = glm::radians(angleDegrees);
+			ModelMatrix = glm::translate(ModelMatrix, glm::vec3(3*glm::sin(angle), 0, 3*glm::cos(angle)));
+			ModelMatrix = glm::rotate(ModelMatrix, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
 			// Send our transformation to the currently bound shader, in the "MVP" uniform
-			glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP3[0][0]);
-			glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix3[0][0]);
+			glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+			glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
 
 			// 1st attribute buffer : vertices
 			glEnableVertexAttribArray(0);
@@ -345,8 +309,16 @@ int main( void )
 
 			// Draw the triangles !
 			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, (void*)0);
-		}
-		////// End of rendering of the third object //////
+		};
+
+		//Render each following object, reusing shaders, textures, adn lighting from the original Suzzanne creation
+		renderSuzzane(45);
+		renderSuzzane(90);
+		renderSuzzane(135);
+		renderSuzzane(180);
+		renderSuzzane(225);
+		renderSuzzane(270);
+		renderSuzzane(315);
 
 
 
