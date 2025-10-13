@@ -149,7 +149,7 @@ int main( void )
 
 	// 12) Add our rectangle
 	float rectSize = 4.0f;
-	float yPos = -1.0f;
+	float yPos = 0.0f;
 	static const GLfloat rectVertexData[] = {
 		-rectSize, yPos, -rectSize,
 		rectSize,  yPos,  rectSize,
@@ -211,7 +211,7 @@ int main( void )
 			// Each object has its own model transform, MVP = Projection * View * Model, and uploads MVP and Model to shader
 			glm::mat4 ModelMatrix1 = glm::mat4(1.0);
 			float angle = glm::radians(0.0f);
-			ModelMatrix1 = glm::translate(ModelMatrix1, glm::vec3(3*glm::sin(angle), 0, 3*glm::cos(angle)));
+			ModelMatrix1 = glm::translate(ModelMatrix1, glm::vec3(3*glm::sin(angle), 1.0f, 3*glm::cos(angle)));
 			ModelMatrix1 = glm::rotate(ModelMatrix1, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 			glm::mat4 MVP1 = ProjectionMatrix * ViewMatrix * ModelMatrix1;
 
@@ -301,7 +301,7 @@ int main( void )
 			// 1) Set Model and MVP matrices
 			glm::mat4 ModelMatrix = glm::mat4(1.0);
 			float angle = glm::radians(angleDegrees);
-			ModelMatrix = glm::translate(ModelMatrix, glm::vec3(3*glm::sin(angle), 0, 3*glm::cos(angle)));
+			ModelMatrix = glm::translate(ModelMatrix, glm::vec3(3.5*glm::sin(angle), 1.0f, 3.5*glm::cos(angle)));
 			ModelMatrix = glm::rotate(ModelMatrix, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 			glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
@@ -343,6 +343,7 @@ int main( void )
 		////// Start of rendering of the rectangle //////
 		{
 			// 1) Set uColor to green
+			glUseProgram(programID);
 			glUniform3f(colorUniform, 0.0f, 1.0f, 0.0f);
 
 			// 2) Set Model and MVP matrices - Set position to the origin
@@ -352,10 +353,15 @@ int main( void )
 			glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrixRect[0][0]);
 
 			// 3) Add verticies
+			glEnableVertexAttribArray(0);
 			glBindBuffer(GL_ARRAY_BUFFER, rectVertexBuffer);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-			// 4) Draw it
+			// 4) Disable per-vertex UV/normals
+			glDisableVertexAttribArray(1);
+    		glDisableVertexAttribArray(2);
+
+			// 5) Draw it
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
 
