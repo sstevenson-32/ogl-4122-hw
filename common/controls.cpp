@@ -9,6 +9,8 @@ using namespace glm;
 
 #include "controls.hpp"
 
+#include <cstdio>
+
 glm::mat4 ViewMatrix;
 glm::mat4 ProjectionMatrix;
 
@@ -30,7 +32,7 @@ float verticalAngle = 0.0f;
 float initialFoV = 45.0f;
 
 float speed = 3.0f; // 3 units / second
-// float mouseSpeed = 0.00005f;
+float angularSpeed = 1.0f;
 
 
 
@@ -42,6 +44,7 @@ void computeMatricesFromInputs(){
 	// Compute time difference between current and last frame
 	double currentTime = glfwGetTime();
 	float deltaTime = float(currentTime - lastTime);
+	float radius = glm::sqrt(position.x * position.x + position.z * position.z);
 
 	// Get mouse position
 	// double xpos, ypos;
@@ -82,13 +85,21 @@ void computeMatricesFromInputs(){
 
 	// Rotate camera left, maintaining radial distance from origin
 	if (glfwGetKey (window, GLFW_KEY_A ) == GLFW_PRESS) {
-		horizontalAngle += speed * deltaTime;		//Angle the camera
-		position += right * deltaTime * speed;		//Place the camera
+		//Angle the camera
+		horizontalAngle += angularSpeed * deltaTime;
+
+		//Keep current radius
+		position.x = radius * glm::sin(horizontalAngle - 3.14f);
+		position.z = radius * glm::cos(horizontalAngle - 3.14f);
 	}
 	// Rotate camera right, maintaining radial distance from origin
 	if (glfwGetKey (window, GLFW_KEY_D ) == GLFW_PRESS) {
-		horizontalAngle -= speed * deltaTime;		//Angle the camera
-		position -= right * deltaTime * speed;		//Place the camera
+		//Angle the camera
+		horizontalAngle -= angularSpeed * deltaTime;
+
+		//Keep current radius
+		position.x = radius * glm::sin(horizontalAngle - 3.14f);
+		position.z = radius * glm::cos(horizontalAngle - 3.14f);
 	}
 
 	// Redially rotate the camera up
@@ -99,6 +110,8 @@ void computeMatricesFromInputs(){
 	if (glfwGetKey( window, GLFW_KEY_DOWN ) == GLFW_PRESS) {
 		verticalAngle -= speed * deltaTime;
 	}
+
+	printf("Position: (%f, %f, %f). horizontalAngle: (%f)\n", position.x, position.y, position.z, horizontalAngle);
 
 	float FoV = initialFoV;// - 5 * glfwGetMouseWheel(); // Now GLFW 3 requires setting up a callback for this. It's a bit too complicated for this beginner's tutorial, so it's disabled instead.
 
