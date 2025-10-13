@@ -39,7 +39,7 @@ using namespace glm;
 
 int main( void )
 {
-	// Initialize GLFW
+	// 1) Initialize GLFW - Windowing API enabling OpenGL to display results
 	if( !glfwInit() )
 	{
 		fprintf( stderr, "Failed to initialize GLFW\n" );
@@ -47,13 +47,14 @@ int main( void )
 		return -1;
 	}
 
+	// 2) Set profile hints, requesting OpenGL3.3 core context with 4x MSAA
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make macOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	// Open a window and create its OpenGL context
+	// 3) Open a window and create its OpenGL context
 	window = glfwCreateWindow( 1024, 768, "Tutorial 09 - Rendering several models", NULL, NULL);
 	if( window == NULL ){
 		fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
@@ -63,7 +64,7 @@ int main( void )
 	}
 	glfwMakeContextCurrent(window);
     
-	// Initialize GLEW
+	// 4) Initialize GLEW - Load OpenGL function pointers from graphics driver
 	glewExperimental = true; // Needed for core profile
 	if (glewInit() != GLEW_OK) {
 		fprintf(stderr, "Failed to initialize GLEW\n");
@@ -72,44 +73,45 @@ int main( void )
 		return -1;
 	}
 
+	// 5) Configure input
 	// Ensure we can capture the escape key being pressed below
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     // Hide the mouse and enable unlimited movement
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     // Set the mouse at the center of the screen
-    glfwPollEvents();
-    glfwSetCursorPos(window, 1024/2, 768/2);
+    // glfwPollEvents();
+    // glfwSetCursorPos(window, 1024/2, 768/2);
 
+	// 6) Set basic GL state
 	// Dark blue background
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
-
-	// Enable depth test
+	// Enable depth test - Closer fragments are shown
 	glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it is closer to the camera than the former one
 	glDepthFunc(GL_LESS); 
-
-	// Cull triangles which normal is not towards the camera
+	// Cull triangles which normal is not towards the camera - Do not process triangles we can't see
 	glEnable(GL_CULL_FACE);
 
+	// 7) Create and bind a Vertax Array Object (VAO) - Configuration of a single piece of geometry
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
+	// 8) Compile and use shaders
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders( "StandardShading.vertexshader", "StandardShading.fragmentshader" );
-
-	// Get a handle for our "MVP" uniform
+	// Get a handle for our "MVP" uniform - Index the GPU uses to access this variable
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 	GLuint ViewMatrixID = glGetUniformLocation(programID, "V");
 	GLuint ModelMatrixID = glGetUniformLocation(programID, "M");
 
+	// 9) Load texture and cache its location on the GPU
 	// Load the texture
 	GLuint Texture = loadDDS("uvmap.DDS");
-	
 	// Get a handle for our "myTextureSampler" uniform
 	GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
 
+	// 10) Load and index model (OBJ) - Read into CPU memory and create indexed arrays, enabling shared verticies
 	// Read our .obj file
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
@@ -122,8 +124,8 @@ int main( void )
 	std::vector<glm::vec3> indexed_normals;
 	indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
 
-	// Load it into a VBO
-
+	// 11) Create and upload VBOs and index buffer - Loading .obj into GPU memory
+	// Load it into a VBO - Vertex data stored in GPU memory
 	GLuint vertexbuffer;
 	glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -145,6 +147,23 @@ int main( void )
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0] , GL_STATIC_DRAW);
 
+	// 12) Add our rectangle, using the same shader
+	static const GLfloat g_vertex_buffer_data[] =
+	{
+		-10.0f, 0.0f, -10.0f,
+		10.0f,  0.0f, -10.0f,
+		10.0f,  0.0f,  10.0f,
+
+		-10.0f, 0.0f, -10.0f,
+		10.0f,  0.0f,  10.0f,
+		-10.0f, 0.0f,  10.0f,
+	};
+	GLuint rectVertexBuffer;
+	glGenBuffers(1, &rectVertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, rectVertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+	// 13) Cache light uniform and initialize timer - Add light to shader (programID)
 	// Get a handle for our "LightPosition" uniform
 	glUseProgram(programID);
 	GLuint LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
@@ -172,12 +191,6 @@ int main( void )
 		computeMatricesFromInputs();
 		glm::mat4 ProjectionMatrix = getProjectionMatrix();
 		glm::mat4 ViewMatrix = getViewMatrix();
-
-
-		////// Start of rendering of the rectangle //////
-		{
-		}
-		
 		
 		////// Start of the rendering of the first object //////
 		{
@@ -258,6 +271,7 @@ int main( void )
 
 		}
 		////// End of rendering of the first object //////
+
 		auto renderSuzzane = [&](float angleDegrees) {
 			// In our very specific case, the 2 objects use the same shader.
 			// So it's useless to re-bind the "programID" shader, since it's already the current one.
@@ -311,7 +325,7 @@ int main( void )
 			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, (void*)0);
 		};
 
-		//Render each following object, reusing shaders, textures, adn lighting from the original Suzzanne creation
+		// 8) Render each following object, reusing shaders, textures, adn lighting from the original Suzzanne creation
 		renderSuzzane(45);
 		renderSuzzane(90);
 		renderSuzzane(135);
@@ -320,8 +334,15 @@ int main( void )
 		renderSuzzane(270);
 		renderSuzzane(315);
 
+		////// Start of rendering of the rectangle //////
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, rectVertexBuffer);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+		}
 
 
+		// 9) Disable vertex attribute arrays (vertices, UVs, normals)
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(2);
