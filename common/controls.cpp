@@ -21,6 +21,11 @@ glm::mat4 getProjectionMatrix(){
 	return ProjectionMatrix;
 }
 
+int lightingStatus = 1;
+int getLightingStatus() {
+	return lightingStatus;
+}
+
 
 // Initial position : on +Z
 glm::vec3 position = glm::vec3( 0, 1.5f, 5 ); 
@@ -109,6 +114,11 @@ void computeMatricesFromInputs(){
 	// Radially rotate the camera down
 	if (glfwGetKey( window, GLFW_KEY_DOWN ) == GLFW_PRESS) {
 		verticalAngle -= speed * deltaTime;
+	}
+
+	//Toggle lighting
+	if (glfwGetKey( window, GLFW_KEY_L ) == GLFW_PRESS) {
+		lightingStatus = (lightingStatus + 1) % 2;
 	}
 
 	// printf("Position: (%f, %f, %f). horizontalAngle: (%f)\n", position.x, position.y, position.z, horizontalAngle);

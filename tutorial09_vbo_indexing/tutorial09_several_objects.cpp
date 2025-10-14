@@ -147,6 +147,10 @@ int main( void )
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0] , GL_STATIC_DRAW);
 
+	//Create a uniform to control lighting
+	GLuint lightingUniform = glGetUniformLocation(programID, "lightingOpts");
+	glUniform1i(lightingUniform, 1);
+
 	// 12) Add our rectangle
 	float rectSize = 4.0f;
 	float yPos = 0.0f;
@@ -340,7 +344,7 @@ int main( void )
 		renderSuzzane(270);
 		renderSuzzane(315);
 
-		////// Start of rendering of the rectangle //////
+		// 9) Render the rectangle
 		{
 			// 1) Set uColor to green
 			glUseProgram(programID);
@@ -365,13 +369,16 @@ int main( void )
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
 
+		// 10) Update lighting as needed
+		glUniform1i(lightingUniform, getLightingStatus());
 
-		// 9) Disable vertex attribute arrays (vertices, UVs, normals)
+		// 11) Disable vertex attribute arrays (vertices, UVs, normals)
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(2);
 
-		// Swap buffers
+		// 12) Swap buffers - While front buffer is displayed, a back buffer is processed. 
+		// This swaps that processed back buffer to the front.
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
