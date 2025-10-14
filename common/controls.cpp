@@ -26,6 +26,8 @@ int getLightingStatus() {
 	return lightingStatus;
 }
 
+//Button debouncing for lighting toggle
+bool isPressed = false;
 
 // Initial position : on +Z
 glm::vec3 position = glm::vec3( 0, 1.5f, 5 ); 
@@ -116,9 +118,16 @@ void computeMatricesFromInputs(){
 		verticalAngle -= speed * deltaTime;
 	}
 
-	//Toggle lighting
+	//Toggle lighting if keypress is new
 	if (glfwGetKey( window, GLFW_KEY_L ) == GLFW_PRESS) {
-		lightingStatus = (lightingStatus + 1) % 2;
+		//Only change lighting status if was not pressed in the last cycle
+		if (!isPressed) {
+			lightingStatus = (lightingStatus + 1) % 2;
+			isPressed = true;
+		}
+	} else {
+		//No longer pressed, toggle state
+		isPressed = false;
 	}
 
 	// printf("Position: (%f, %f, %f). horizontalAngle: (%f)\n", position.x, position.y, position.z, horizontalAngle);
