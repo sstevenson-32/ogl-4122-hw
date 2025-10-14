@@ -37,6 +37,8 @@ float horizontalAngle = 3.14f;
 float verticalAngle = 0.0f;
 // Initial Field of View
 float initialFoV = 45.0f;
+// Constant world up
+const glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 float speed = 3.0f; // 3 units / second
 float angularSpeed = 3.0f;
@@ -53,54 +55,44 @@ void computeMatricesFromInputs(){
 	float deltaTime = float(currentTime - lastTime);
 	float radius = glm::sqrt(position.x * position.x + position.y * position.y + position.z * position.z);
 
-	// Direction : Spherical coordinates to Cartesian coordinates conversion
-	glm::vec3 direction(
-		cos(verticalAngle) * sin(horizontalAngle), 
-		sin(verticalAngle),
-		cos(verticalAngle) * cos(horizontalAngle)
-	);
-	
-	// Right vector
-	glm::vec3 right = glm::vec3(
-		sin(horizontalAngle - 3.14f/2.0f), 
-		0,
-		cos(horizontalAngle - 3.14f/2.0f)
-	);
-	
-	// Up vector
-	glm::vec3 up = glm::cross( right, direction );
-
+	// 1) Update angles from input
 	// Rotate camera right, maintaining radial distance from origin
 	if (glfwGetKey (window, GLFW_KEY_D ) == GLFW_PRESS) {
-		//Angle the camera
 		horizontalAngle += angularSpeed * deltaTime;
 	}
 	// Rotate camera left, maintaining radial distance from origin
 	if (glfwGetKey (window, GLFW_KEY_A ) == GLFW_PRESS) {
-		//Angle the camera
 		horizontalAngle -= angularSpeed * deltaTime;
 	}
 
-	// Redially rotate the camera up, maintaining distance from origin
+	// Radially rotate the camera up, maintaining distance from origin
 	if (glfwGetKey( window, GLFW_KEY_UP ) == GLFW_PRESS) {
-		// Angle the camera
 		verticalAngle -= angularSpeed * deltaTime;
 	}
 	// Radially rotate the camera down
 	if (glfwGetKey( window, GLFW_KEY_DOWN ) == GLFW_PRESS) {
-		// Angle the camera
 		verticalAngle += angularSpeed * deltaTime;
 	}
 
-	//Set position based on changes to angles
-	position = radius * glm::vec3(
-        cos(verticalAngle) * sin(horizontalAngle - 3.14f),
-        sin(verticalAngle),
-        cos(verticalAngle) * cos(horizontalAngle - 3.14f)
-    );
-	//Set direction so we are always looking at the origin
-	direction = -position;
+	// 2) Clamp pitch to avoid looking directly up/down
+	const float maxPitch = glm::radians(89.0f);
+    verticalAngle = glm::clamp(verticalAngle, -maxPitch, maxPitch);
 
+	// 3) Set position based on changes to angles - Spherical to cartesian
+	position = radius * glm::vec3(
+        cos(verticalAngle) * sin(horizontalAngle),
+        sin(verticalAngle),
+        cos(verticalAngle) * cos(horizontalAngle)
+    );
+
+	// 4) Set direction so we are always looking at the origin
+	glm::vec3 direction = -position;
+
+	// 5) Build orthonormal basis from fixed world-up
+    glm::vec3 right = glm::normalize(glm::cross(direction, worldUp));
+    glm::vec3 up = glm::normalize(glm::cross(right, direction));
+
+	// 6) Zoom in/out as needed
 	// Move forward, closer to the origin
 	if (glfwGetKey( window, GLFW_KEY_W ) == GLFW_PRESS) {
 		position += direction * deltaTime * speed;
@@ -110,7 +102,7 @@ void computeMatricesFromInputs(){
 		position -= direction * deltaTime * speed;
 	}
 
-	//Toggle lighting if keypress is new
+	// 7) Toggle lighting if keypress is new
 	if (glfwGetKey( window, GLFW_KEY_L ) == GLFW_PRESS) {
 		//Only change lighting status if was not pressed in the last cycle
 		if (!isPressed) {
@@ -124,6 +116,7 @@ void computeMatricesFromInputs(){
 
 	// printf("Position: (%f, %f, %f). Radius: (%f). horizontalAngle: (%f). verticleAngle: (%f).\n", position.x, position.y, position.z, radius, horizontalAngle, verticalAngle);
 
+	// 8) Set view values
 	// Projection matrix : 45� Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
 	ProjectionMatrix = glm::perspective(glm::radians(initialFoV), 4.0f / 3.0f, 0.1f, 100.0f);
 	// Camera matrix
