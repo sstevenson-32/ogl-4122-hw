@@ -39,7 +39,7 @@ float verticalAngle = 0.0f;
 float initialFoV = 45.0f;
 
 float speed = 3.0f; // 3 units / second
-float angularSpeed = 1.0f;
+float angularSpeed = 3.0f;
 
 
 
@@ -51,18 +51,7 @@ void computeMatricesFromInputs(){
 	// Compute time difference between current and last frame
 	double currentTime = glfwGetTime();
 	float deltaTime = float(currentTime - lastTime);
-	float radius = glm::sqrt(position.x * position.x + position.z * position.z);
-
-	// Get mouse position
-	// double xpos, ypos;
-	// glfwGetCursorPos(window, &xpos, &ypos);
-
-	// Reset mouse position for next frame
-	// glfwSetCursorPos(window, 1024/2, 768/2);
-
-	// Compute new orientation
-	// horizontalAngle += mouseSpeed * float(1024/2 - xpos );
-	// verticalAngle   += mouseSpeed * float( 768/2 - ypos );
+	float radius = glm::sqrt(position.x * position.x + position.y * position.y + position.z * position.z);
 
 	// Direction : Spherical coordinates to Cartesian coordinates conversion
 	glm::vec3 direction(
@@ -81,6 +70,37 @@ void computeMatricesFromInputs(){
 	// Up vector
 	glm::vec3 up = glm::cross( right, direction );
 
+	// Rotate camera right, maintaining radial distance from origin
+	if (glfwGetKey (window, GLFW_KEY_D ) == GLFW_PRESS) {
+		//Angle the camera
+		horizontalAngle += angularSpeed * deltaTime;
+	}
+	// Rotate camera left, maintaining radial distance from origin
+	if (glfwGetKey (window, GLFW_KEY_A ) == GLFW_PRESS) {
+		//Angle the camera
+		horizontalAngle -= angularSpeed * deltaTime;
+	}
+
+	// Redially rotate the camera up, maintaining distance from origin
+	if (glfwGetKey( window, GLFW_KEY_UP ) == GLFW_PRESS) {
+		// Angle the camera
+		verticalAngle -= angularSpeed * deltaTime;
+	}
+	// Radially rotate the camera down
+	if (glfwGetKey( window, GLFW_KEY_DOWN ) == GLFW_PRESS) {
+		// Angle the camera
+		verticalAngle += angularSpeed * deltaTime;
+	}
+
+	//Set position based on changes to angles
+	position = radius * glm::vec3(
+        cos(verticalAngle) * sin(horizontalAngle - 3.14f),
+        sin(verticalAngle),
+        cos(verticalAngle) * cos(horizontalAngle - 3.14f)
+    );
+	//Set direction so we are always looking at the origin
+	direction = -position;
+
 	// Move forward, closer to the origin
 	if (glfwGetKey( window, GLFW_KEY_W ) == GLFW_PRESS) {
 		position += direction * deltaTime * speed;
@@ -88,34 +108,6 @@ void computeMatricesFromInputs(){
 	// Move backward, away from the origin
 	if (glfwGetKey( window, GLFW_KEY_S ) == GLFW_PRESS) {
 		position -= direction * deltaTime * speed;
-	}
-
-	// Rotate camera right, maintaining radial distance from origin
-	if (glfwGetKey (window, GLFW_KEY_D ) == GLFW_PRESS) {
-		//Angle the camera
-		horizontalAngle += angularSpeed * deltaTime;
-
-		//Keep current radius
-		position.x = radius * glm::sin(horizontalAngle - 3.14f);
-		position.z = radius * glm::cos(horizontalAngle - 3.14f);
-	}
-	// Rotate camera left, maintaining radial distance from origin
-	if (glfwGetKey (window, GLFW_KEY_A ) == GLFW_PRESS) {
-		//Angle the camera
-		horizontalAngle -= angularSpeed * deltaTime;
-
-		//Keep current radius
-		position.x = radius * glm::sin(horizontalAngle - 3.14f);
-		position.z = radius * glm::cos(horizontalAngle - 3.14f);
-	}
-
-	// Redially rotate the camera up
-	if (glfwGetKey( window, GLFW_KEY_UP ) == GLFW_PRESS) {
-		verticalAngle += speed * deltaTime;
-	}
-	// Radially rotate the camera down
-	if (glfwGetKey( window, GLFW_KEY_DOWN ) == GLFW_PRESS) {
-		verticalAngle -= speed * deltaTime;
 	}
 
 	//Toggle lighting if keypress is new
@@ -130,12 +122,10 @@ void computeMatricesFromInputs(){
 		isPressed = false;
 	}
 
-	// printf("Position: (%f, %f, %f). horizontalAngle: (%f)\n", position.x, position.y, position.z, horizontalAngle);
-
-	float FoV = initialFoV;// - 5 * glfwGetMouseWheel(); // Now GLFW 3 requires setting up a callback for this. It's a bit too complicated for this beginner's tutorial, so it's disabled instead.
+	// printf("Position: (%f, %f, %f). Radius: (%f). horizontalAngle: (%f). verticleAngle: (%f).\n", position.x, position.y, position.z, radius, horizontalAngle, verticalAngle);
 
 	// Projection matrix : 45� Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-	ProjectionMatrix = glm::perspective(glm::radians(FoV), 4.0f / 3.0f, 0.1f, 100.0f);
+	ProjectionMatrix = glm::perspective(glm::radians(initialFoV), 4.0f / 3.0f, 0.1f, 100.0f);
 	// Camera matrix
 	ViewMatrix       = glm::lookAt(
 								position,           // Camera is here
