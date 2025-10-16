@@ -67,11 +67,11 @@ void computeMatricesFromInputs(){
 
 	// Radially rotate the camera up, maintaining distance from origin
 	if (glfwGetKey( window, GLFW_KEY_UP ) == GLFW_PRESS) {
-		verticalAngle -= angularSpeed * deltaTime;
+		verticalAngle += angularSpeed * deltaTime;
 	}
 	// Radially rotate the camera down
 	if (glfwGetKey( window, GLFW_KEY_DOWN ) == GLFW_PRESS) {
-		verticalAngle += angularSpeed * deltaTime;
+		verticalAngle -= angularSpeed * deltaTime;
 	}
 
 	// 2) Clamp pitch to avoid looking directly up/down
