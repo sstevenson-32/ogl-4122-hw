@@ -169,7 +169,7 @@ add_custom_command(
 )
 add_custom_command(
    TARGET tutorial09_several_objects POST_BUILD
-   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/buzzy_bowl{CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/buzzy_bowl/"
+   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/buzzy_bowl${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/buzzy_bowl/"
 )
 elseif (${CMAKE_GENERATOR} MATCHES "Xcode" )
 
