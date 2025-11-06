@@ -168,8 +168,13 @@ add_custom_command(
    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/tutorial09_several_objects${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/"
 )
 add_custom_command(
-   TARGET tutorial09_several_objects POST_BUILD
+   TARGET buzzy_bowl POST_BUILD
    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/buzzy_bowl${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/buzzy_bowl/"
+   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_SOURCE_DIR}/buzzy_bowl/StandardShading.vertexshader" "${CMAKE_CURRENT_BINARY_DIR}"
+   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_SOURCE_DIR}/buzzy_bowl/StandardShading.fragmentshader" "${CMAKE_CURRENT_BINARY_DIR}"
+   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_SOURCE_DIR}/buzzy_bowl/ff.bmp" "${CMAKE_CURRENT_BINARY_DIR}"
+   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_SOURCE_DIR}/buzzy_bowl/suzanne.obj" "${CMAKE_CURRENT_BINARY_DIR}"
+   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_SOURCE_DIR}/buzzy_bowl/uvmap.DDS" "${CMAKE_CURRENT_BINARY_DIR}"
 )
 elseif (${CMAKE_GENERATOR} MATCHES "Xcode" )
 

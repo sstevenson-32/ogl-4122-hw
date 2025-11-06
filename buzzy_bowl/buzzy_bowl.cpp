@@ -102,7 +102,8 @@ int main( void )
 	// 9) Load texture and cache its location on the GPU
 	// Load the textures
 	GLuint Texture = loadDDS("uvmap.DDS");
-	GLuint RectTexture = loadDDS("greenTile.DDS");
+	//GLuint RectTexture = loadDDS("greenTile.DDS");
+	GLuint RectTexture = loadBMP_custom("ff.bmp");
 	// Get a handle for our "myTextureSampler" uniform
 	GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
 
@@ -149,16 +150,18 @@ int main( void )
 
 	// 12) Add our rectangle
 	float rectSize = 4.0f;
+	float rectWidth = 50.0f;
+	float rectHeight = 30.0f;
 	float yPos = 0.0f;
 	// Set base vertices
 	static const GLfloat rectVertexData[] = {
-		-rectSize, yPos, -rectSize,
-		rectSize,  yPos,  rectSize,
-		-rectSize, yPos,  rectSize,
+		-rectHeight, yPos,  rectWidth,
+		rectHeight,  yPos,  rectWidth,
+		-rectHeight, yPos, rectWidth,
 
-		-rectSize, yPos, -rectSize,
-		rectSize,  yPos, -rectSize,
-		rectSize,  yPos,  rectSize,
+		-rectHeight, yPos, -rectWidth,
+		rectHeight,  yPos, -rectWidth,
+		rectHeight,  yPos,  rectWidth,
 	};
 	GLuint rectVertexBuffer;
 	glGenBuffers(1, &rectVertexBuffer);
