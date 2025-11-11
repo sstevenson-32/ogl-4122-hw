@@ -10,7 +10,7 @@ Description:
 Build Instructions
 mkdir build; cd ./build
 cmake ../
-cmake --build . --target tutorial09_several_objects
+cmake --build . --target buzzy_bowl
 */
 
 // Include standard headers
@@ -104,6 +104,12 @@ int main( void )
 	GLuint Texture = loadDDS("uvmap.DDS");
 	//GLuint RectTexture = loadDDS("greenTile.DDS");
 	GLuint RectTexture = loadBMP_custom("ff.bmp");
+
+	// Force swizzle so GBR -> RGB
+	glBindTexture(GL_TEXTURE_2D, RectTexture);
+	GLint swizzleMask[] = { GL_GREEN, GL_BLUE, GL_RED, GL_ALPHA };
+	glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+
 	// Get a handle for our "myTextureSampler" uniform
 	GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
 
@@ -150,14 +156,14 @@ int main( void )
 
 	// 12) Add our rectangle
 	float rectSize = 4.0f;
-	float rectWidth = 50.0f;
-	float rectHeight = 30.0f;
+	float rectHeight = 60.0f;
+	float rectWidth = 30.0f;
 	float yPos = 0.0f;
 	// Set base vertices
 	static const GLfloat rectVertexData[] = {
-		-rectHeight, yPos,  rectWidth,
-		rectHeight,  yPos,  rectWidth,
-		-rectHeight, yPos, rectWidth,
+		rectHeight, yPos,  rectWidth,
+		-rectHeight,  yPos,  rectWidth,
+		-rectHeight, yPos, -rectWidth,
 
 		-rectHeight, yPos, -rectWidth,
 		rectHeight,  yPos, -rectWidth,
@@ -170,8 +176,8 @@ int main( void )
 
 	// Set normal vectors for each vertex, each along y axis
 	static const GLfloat rectNormalData[] = {
-	0,1,0,  0,1,0,  0,1,0,
-	0,1,0,  0,1,0,  0,1,0
+		0,1,0,  0,1,0,  0,1,0,
+		0,1,0,  0,1,0,  0,1,0
 	};
 	GLuint rectNormalBuffer;
 	glGenBuffers(1, &rectNormalBuffer);
@@ -179,10 +185,10 @@ int main( void )
 	glBufferData(GL_ARRAY_BUFFER, sizeof(rectNormalData), rectNormalData, GL_STATIC_DRAW);
 
 	// Set UV vectors for each vertex, determines how a texture is placed on the shape at each vertex
-	static const GLfloat rectUVData[] = {
-	0,0,  1,1,  0,1,
-	0,0,  1,0,  1,1
-	};
+    static const GLfloat rectUVData[] = {
+        1.0f,1.0f,  0.0f,1.0f,  0.0f,0.0f,
+        0.0f,0.0f,  1.0f,0.0f,  1.0f,1.0f
+    };
 	GLuint rectUVBuffer;
 	glGenBuffers(1, &rectUVBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, rectUVBuffer);
@@ -268,38 +274,41 @@ int main( void )
 
 		// 5) Render the rectangle
 		{
-			// 1) Set uColor to green
-			glUseProgram(programID);
-			glUniform3f(colorUniform, 0.0f, 1.0f, 0.0f);
+            // 1) Set uColor to green
+            glUseProgram(programID);
+            glUniform3f(colorUniform, 0.0f, 1.0f, 0.0f);
 
-			// 2) Bind the texture for our rectangle
-			glBindTexture(GL_TEXTURE_2D, RectTexture);
+            // 2) Bind the texture for our rectangle
+            // glBindTexture(GL_TEXTURE_2D, RectTexture);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, RectTexture);
+            glUniform1i(TextureID, 0);
 
-			// 3) Set Model and MVP matrices - Set position to the origin
-			glm::mat4 ModelMatrixRect = glm::mat4(1.0);
-			glm::mat4 MVPRect = ProjectionMatrix * ViewMatrix * ModelMatrixRect;
-			glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVPRect[0][0]);
-			glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrixRect[0][0]);
+            // 3) Set Model and MVP matrices - Set position to the origin
+            glm::mat4 ModelMatrixRect = glm::mat4(1.0);
+            glm::mat4 MVPRect = ProjectionMatrix * ViewMatrix * ModelMatrixRect;
+            glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVPRect[0][0]);
+            glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrixRect[0][0]);
 
-			// 4) Enable position (0)
-			glEnableVertexAttribArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, rectVertexBuffer);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+            // 4) Enable position (0)
+            glEnableVertexAttribArray(0);
+            glBindBuffer(GL_ARRAY_BUFFER, rectVertexBuffer);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-			// 5) Enable UV (1)
-			glEnableVertexAttribArray(1);
-			glBindBuffer(GL_ARRAY_BUFFER, rectNormalBuffer);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+            // 5) Enable UV (1)
+            glEnableVertexAttribArray(1);
+            glBindBuffer(GL_ARRAY_BUFFER, rectUVBuffer);
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-			// 6) Enable normals (2)
-			glEnableVertexAttribArray(2);
-			glBindBuffer(GL_ARRAY_BUFFER, rectUVBuffer);
-			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+            // 6) Enable normals (2)
+            glEnableVertexAttribArray(2);
+            glBindBuffer(GL_ARRAY_BUFFER, rectNormalBuffer);
+            glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-			// 7) Draw it, disabling CULL_FACE when drawing
-			glDisable(GL_CULL_FACE);
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-			glEnable(GL_CULL_FACE);
+            // 7) Draw it, disabling CULL_FACE when drawing
+            glDisable(GL_CULL_FACE);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            glEnable(GL_CULL_FACE);
 		}
 
 		// 6) Update lighting as needed based on user input
