@@ -100,16 +100,14 @@ void ECE_UAV::physicsLoop()
                 {
                     m_state = ECE_UAV::UAVState::DONE;
                 }
-
                 break;
             }
-
             case ECE_UAV::UAVState::DONE:
             {
-                uavForce = {0.0f, 0.0f, 0.0f};
+                uavForce = { 0.0f, 0.0f, 0.0f };
                 break;
             }
-            applyKinematics(uavForce);
+                applyKinematics(uavForce);
         }
 
         if (elapsedTime.count() < DELTAT)
@@ -119,8 +117,35 @@ void ECE_UAV::physicsLoop()
     }
 }
 
+void ECE_UAV::applyKinematics(const std::array<float, 3> uavForce)
+{
+    // first we need to determine if the force needs to be clamped
+    std::array<float, 3> netForce = clampMagnitude(uavForce, MAXFORCE);
+    netForce[1] += GRAVITY;
 
-void ECE_UAV::start() { m_movement = std::thread(threadFunction, this); }
+    m_acceleration[0] = netForce[0] / MASS;
+    m_acceleration[1] = netForce[1] / MASS;
+    m_acceleration[2] = netForce[2] / MASS;
+
+    // adjusting the position of the uav
+    m_position[0]
+        = m_position[0] + (m_velocity[0] * DELTAT) + (0.5 * m_acceleration[0] * m_acceleration[0]);
+    m_position[1]
+        = m_position[1] + (m_velocity[1] * DELTAT) + (1.5 * m_acceleration[1] * m_acceleration[1]);
+    m_position[2]
+        = m_position[2] + (m_velocity[2] * DELTAT) + (2.5 * m_acceleration[2] * m_acceleration[2]);
+
+    // adjust the velocity of the uav
+    m_velocity[0] = m_velocity[0] + (m_acceleration[0] * DELTAT);
+    m_velocity[1] = m_velocity[1] + (m_acceleration[1] * DELTAT);
+    m_velocity[2] = m_velocity[2] + (m_acceleration[2] * DELTAT);
+}
+
+void ECE_UAV::start()
+{
+    m_isMoving = true;
+    m_movement = std::thread(threadFunction, this);
+}
 
 void ECE_UAV::stop()
 {
@@ -131,8 +156,10 @@ void ECE_UAV::stop()
     }
 }
 
-float ECE_UAV::distanceToCenter()
+float ECE_UAV::distanceToSphereCenter() const
 {
     // determine magnitude to center
-    return std::sqrt((m_position[0] - SPHERE_C))
+    return std::sqrt(std::pow(m_position[0] - SPHERE_CENTER[0], 2)
+                     + std::pow(m_position[1] - SPHERE_CENTER[1], 2)
+                     + std::pow(m_position[2] - SPHERE_CENTER[2], 2));
 }
