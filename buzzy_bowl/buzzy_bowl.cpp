@@ -30,11 +30,13 @@ GLFWwindow* window;
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
-#include <common/shader.hpp>
-#include <common/texture.hpp>
-#include <common/controls.hpp>
-#include <common/objloader.hpp>
-#include <common/vboindexer.hpp>
+#include "../common/shader.hpp"
+#include "../common/texture.hpp"
+#include "../common/controls.hpp"
+#include "../common/objloader.hpp"
+#include "../common/vboindexer.hpp"
+
+#include "ECE_UAV.h"
 
 int main( void )
 {
@@ -199,6 +201,22 @@ int main( void )
 	glUseProgram(programID);
 	glUniform3f(colorUniform, 0.0f, 1.0f, 0.0f);
 
+    std::vector<std::unique_ptr<ECE_UAV>> uavs;
+    std::vector<float> yardLines = { -50.0f, -25.0f, 0.0f, 25.0f, 50.0f };
+
+    for (float lineY : yardLines)
+    {
+        for (int i = -1; i <= 1; i++)
+        {
+            float offsetX = i * 10.0f;
+
+            auto pUAV = std::make_unique<ECE_UAV>(std::array<float, 3>{offsetX, lineY, 0.0f});
+            pUAV -> start();
+            uavs.push_back(std::move(pUAV));
+        }
+    }
+    
+    
 	// 13) Cache light uniform and initialize timer - Add light to shader (programID)
 	// Get a handle for our "LightPosition" uniform
 	glUseProgram(programID);

@@ -7,14 +7,17 @@
 
 void threadFunction(ECE_UAV* pUAV) { pUAV->physicsLoop(); }
 
-ECE_UAV::ECE_UAV(const std::array<float, 3>& position,
-                 const std::array<float, 3>& velocity,
-                 const std::array<float, 3>& acceleration)
+ECE_UAV::ECE_UAV(const std::array<float, 3>& position)
 {
     m_position     = position;
-    m_velocity     = velocity;
-    m_acceleration = acceleration;
+    m_velocity     = {0.0f, 0.0f, 0.0f};
+    m_acceleration = {0.0f, 0.0f, 0.0f};
     m_state        = ECE_UAV::UAVState::WAITING;
+}
+
+ECE_UAV::~ECE_UAV()
+{
+    stop();
 }
 
 // accesor methods
