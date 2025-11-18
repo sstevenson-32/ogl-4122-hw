@@ -29,10 +29,10 @@ public:
 
     // get the position of the uav
     // used for main render loop
-    std::array<float, 3> getPosition() const;
+    std::array<float, 3> getPosition()const;
 
     // check the status of the UAV
-    UAVState getState() const;
+    std::atomic<ECE_UAV::UAVState>& getState();
     bool     isDone() const;  // helper to check if the state of the UAV is DONE
 
 
@@ -43,6 +43,7 @@ public:
     void  setVelocity(const std::array<float, 3>& velocity);  // set m_position to this array;
     float getVelMag() const;                                  // return magnitude of velocity vector
     float distanceTo(const ECE_UAV& otherUAV) const;
+    float distanceToSphereCenter() const;
     // void setPosition(const std::array<float, 3>& position);  // set m_position to this array;
     // void setAcceleration(
     //     const std::array<float, 3>& acceleration);  // set m_position to this array;
@@ -86,7 +87,6 @@ private:
     std::array<float, 3> calculateSeekForce(const std::array<float, 3>& target, float maxSpeed);
     std::array<float, 3> calculateOrbitForce();
     std::array<float, 3> clampMagnitude(std::array<float, 3> v, float maxMag);
-    float distanceToSphereCenter() const;
 
     friend void threadFunction(ECE_UAV* pUAV);
 };
