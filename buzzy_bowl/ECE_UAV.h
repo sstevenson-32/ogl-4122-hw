@@ -19,9 +19,8 @@ public:
 
     // constructor for the UAV object that takes in it's starting position, velocity and
     // acceleration
-    ECE_UAV(const std::array<float, 3>& position,
-            const std::array<float, 3>& velocity,
-            const std::array<float, 3>& acceleration);
+    ECE_UAV(const std::array<float, 3>& position);
+    ~ECE_UAV();
 
     // start or stop the thread
     void start();
