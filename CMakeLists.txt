@@ -1,5 +1,5 @@
 # CMake entry point
-cmake_minimum_required (VERSION 3.0)
+cmake_minimum_required (VERSION 3.10)
 project (Tutorials)
 
 find_package(OpenGL REQUIRED)
@@ -21,7 +21,6 @@ endif()
 add_subdirectory (external)
 
 # On Visual 2005 and above, this module can set the debug working directory
-cmake_policy(SET CMP0026 OLD)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/rpavlik-cmake-modules-fe2273")
 include(CreateLaunchers)
 include(MSVCMultipleProcessCompile) # /MP
@@ -55,77 +54,77 @@ add_definitions(
 )
 
 # Tutorial 9
-add_executable(tutorial09_vbo_indexing
-	tutorial09_vbo_indexing/tutorial09.cpp
-	common/shader.cpp
-	common/shader.hpp
-	common/controls.cpp
-	common/controls.hpp
-	common/texture.cpp
-	common/texture.hpp
-	common/objloader.cpp
-	common/objloader.hpp
-	common/vboindexer.cpp
-	common/vboindexer.hpp
-	
-	tutorial09_vbo_indexing/StandardShading.vertexshader
-	tutorial09_vbo_indexing/StandardShading.fragmentshader
-)
-target_link_libraries(tutorial09_vbo_indexing
-	${ALL_LIBS}
-)
-# Xcode and Visual working directories
-set_target_properties(tutorial09_vbo_indexing PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/")
-create_target_launcher(tutorial09_vbo_indexing WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/")
-
-# Tutorial 9 - AssImp model loading
-add_executable(tutorial09_AssImp
-	tutorial09_vbo_indexing/tutorial09_AssImp.cpp
-	common/shader.cpp
-	common/shader.hpp
-	common/controls.cpp
-	common/controls.hpp
-	common/texture.cpp
-	common/texture.hpp
-	common/objloader.cpp
-	common/objloader.hpp
-	
-	tutorial09_vbo_indexing/StandardShading.vertexshader
-	tutorial09_vbo_indexing/StandardShading.fragmentshader
-)
-target_link_libraries(tutorial09_AssImp
-	${ALL_LIBS}
-	assimp
-)
-set_target_properties(tutorial09_AssImp PROPERTIES COMPILE_DEFINITIONS "USE_ASSIMP")
-# Xcode and Visual working directories
-set_target_properties(tutorial09_AssImp PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/")
-create_target_launcher(tutorial09_AssImp WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/")
-
-# Tutorial 9 - several objects
-add_executable(tutorial09_several_objects
-	tutorial09_vbo_indexing/tutorial09_several_objects.cpp
-	common/shader.cpp
-	common/shader.hpp
-	common/controls.cpp
-	common/controls.hpp
-	common/texture.cpp
-	common/texture.hpp
-	common/objloader.cpp
-	common/objloader.hpp
-	common/vboindexer.cpp
-	common/vboindexer.hpp
-	
-	tutorial09_vbo_indexing/StandardShading.vertexshader
-	tutorial09_vbo_indexing/StandardShading.fragmentshader
-)
-target_link_libraries(tutorial09_several_objects
-	${ALL_LIBS}
-)
-# Xcode and Visual working directories
-set_target_properties(tutorial09_several_objects PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/")
-create_target_launcher(tutorial09_several_objects WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/")
-
+# add_executable(tutorial09_vbo_indexing
+# 	tutorial09_vbo_indexing/tutorial09.cpp
+# 	common/shader.cpp
+# 	common/shader.hpp
+# 	common/controls.cpp
+# 	common/controls.hpp
+# 	common/texture.cpp
+# 	common/texture.hpp
+# 	common/objloader.cpp
+# 	common/objloader.hpp
+# 	common/vboindexer.cpp
+# 	common/vboindexer.hpp
+#
+# 	tutorial09_vbo_indexing/StandardShading.vertexshader
+# 	tutorial09_vbo_indexing/StandardShading.fragmentshader
+# )
+# target_link_libraries(tutorial09_vbo_indexing
+# 	${ALL_LIBS}
+# )
+# # Xcode and Visual working directories
+# set_target_properties(tutorial09_vbo_indexing PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/")
+# create_target_launcher(tutorial09_vbo_indexing WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/")
+#
+# # Tutorial 9 - AssImp model loading
+# add_executable(tutorial09_AssImp
+# 	tutorial09_vbo_indexing/tutorial09_AssImp.cpp
+# 	common/shader.cpp
+# 	common/shader.hpp
+# 	common/controls.cpp
+# 	common/controls.hpp
+# 	common/texture.cpp
+# 	common/texture.hpp
+# 	common/objloader.cpp
+# 	common/objloader.hpp
+#
+# 	tutorial09_vbo_indexing/StandardShading.vertexshader
+# 	tutorial09_vbo_indexing/StandardShading.fragmentshader
+# )
+# target_link_libraries(tutorial09_AssImp
+# 	${ALL_LIBS}
+# 	assimp
+# )
+# set_target_properties(tutorial09_AssImp PROPERTIES COMPILE_DEFINITIONS "USE_ASSIMP")
+# # Xcode and Visual working directories
+# set_target_properties(tutorial09_AssImp PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/")
+# create_target_launcher(tutorial09_AssImp WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/")
+#
+# # Tutorial 9 - several objects
+# add_executable(tutorial09_several_objects
+# 	tutorial09_vbo_indexing/tutorial09_several_objects.cpp
+# 	common/shader.cpp
+# 	common/shader.hpp
+# 	common/controls.cpp
+# 	common/controls.hpp
+# 	common/texture.cpp
+# 	common/texture.hpp
+# 	common/objloader.cpp
+# 	common/objloader.hpp
+# 	common/vboindexer.cpp
+# 	common/vboindexer.hpp
+#
+# 	tutorial09_vbo_indexing/StandardShading.vertexshader
+# 	tutorial09_vbo_indexing/StandardShading.fragmentshader
+# )
+# target_link_libraries(tutorial09_several_objects
+# 	${ALL_LIBS}
+# )
+# # Xcode and Visual working directories
+# set_target_properties(tutorial09_several_objects PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/")
+# create_target_launcher(tutorial09_several_objects WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/")
+#
 # Buzzy Bowl
 add_executable(buzzy_bowl
 	buzzy_bowl/buzzy_bowl.cpp
@@ -142,6 +141,8 @@ add_executable(buzzy_bowl
 	
 	buzzy_bowl/StandardShading.vertexshader
 	buzzy_bowl/StandardShading.fragmentshader
+    buzzy_bowl/ECE_UAV.cpp
+    buzzy_bowl/ECE_UAV.h
 )
 target_link_libraries(buzzy_bowl
 	${ALL_LIBS}
@@ -155,18 +156,18 @@ SOURCE_GROUP(shaders REGULAR_EXPRESSION ".*/.*shader$" )
 
 
 if (NOT ${CMAKE_GENERATOR} MATCHES "Xcode" )
-add_custom_command(
-   TARGET tutorial09_vbo_indexing POST_BUILD
-   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/tutorial09_vbo_indexing${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/"
-)
-add_custom_command(
-   TARGET tutorial09_AssImp POST_BUILD
-   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/tutorial09_AssImp${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/"
-)
-add_custom_command(
-   TARGET tutorial09_several_objects POST_BUILD
-   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/tutorial09_several_objects${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/"
-)
+# add_custom_command(
+#    TARGET tutorial09_vbo_indexing POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/tutorial09_vbo_indexing${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/"
+# )
+# add_custom_command(
+#    TARGET tutorial09_AssImp POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/tutorial09_AssImp${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/"
+# )
+# add_custom_command(
+#    TARGET tutorial09_several_objects POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/tutorial09_several_objects${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/tutorial09_vbo_indexing/"
+# )
 add_custom_command(
    TARGET buzzy_bowl POST_BUILD
    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/buzzy_bowl${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/buzzy_bowl/"
