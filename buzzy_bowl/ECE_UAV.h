@@ -37,6 +37,10 @@ public:
 
     // float distanceToCenter() const;
     float getForceMag() const;  // return the magnitude of the force vector
+                                //
+    std::array<float, 3> getVelocity()const;
+
+    void swapVelocity(ECE_UAV& otherUAV);
 
     // used for elastic collisions
     void  setVelocity(const std::array<float, 3>& velocity);  // set m_position to this array;

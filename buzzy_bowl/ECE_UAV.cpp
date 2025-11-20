@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstring>
 #include <mutex>
+#include <utility>
 
 void threadFunction(ECE_UAV* pUAV) { pUAV->physicsLoop(); }
 
@@ -25,6 +26,17 @@ std::array<float, 3> ECE_UAV::getPosition() const
 {
     std::lock_guard<std::mutex> lock(m_kinematicsMutex);
     return m_position;
+}
+
+std::array<float, 3> ECE_UAV::getVelocity() const 
+{
+    std::lock_guard<std::mutex> lock(m_kinematicsMutex);
+    return m_velocity;
+}
+
+void ECE_UAV::swapVelocity(ECE_UAV& otherUAV)
+{
+    std::swap(m_velocity, otherUAV.m_velocity);
 }
 
 std::atomic<ECE_UAV::UAVState>& ECE_UAV::getState() { return m_state; }

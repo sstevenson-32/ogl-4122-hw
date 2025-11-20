@@ -279,7 +279,7 @@ int main(void)
         {
             std::array<float, 3> physPos     = uav->getPosition();
             glm::mat4            ModelMatrix = glm::mat4(1.0);
-            glm::vec3            position    = glm::vec3(physPos[0], physPos[1], physPos[2]);
+            glm::vec3            position    = glm::vec3(physPos[1], physPos[2], physPos[0]);
             ModelMatrix                      = glm::translate(ModelMatrix, position);
             glm::mat4 MVP                    = ProjectionMatrix * ViewMatrix * ModelMatrix;
             glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
@@ -305,6 +305,18 @@ int main(void)
 
             // 3) Draw the triangles !
             glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, (void*) 0);
+        }
+
+        for (size_t i = 0; i < uavs.size(); i++) 
+        {
+            for (size_t j = i + 1; j < uavs.size(); j++)
+            {
+                if (uavs[i] -> distanceTo(*uavs[j]) < 0.25f)
+                {
+                    uavs[i] -> setVelocity(uavs[j] -> getVelocity());
+                    uavs[j] -> setVelocity(const std::array<float, 3> &velocity)
+                }
+            }
         }
         // for (float angleDegrees = 0.0f; angleDegrees <= 360.0f; angleDegrees += 45.0f) {
         // 1) Set Model and MVP matrices
