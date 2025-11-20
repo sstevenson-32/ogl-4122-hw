@@ -58,6 +58,7 @@ private:
     const float MAXFORCE          = 20.0;
     const float GRAVITY           = -10.0;
     const float DELTAT            = 0.10;
+    const float UAVRADIUS         = 0.5f;
 
     const std::array<float, 3> SPHERE_CENTER = {0.0f, 0.0f, 50.0f};
     const float SPHERERADIUS = 10.0f;

@@ -18,6 +18,7 @@ cmake --build . --target buzzy_bowl
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+#include <iostream>
 
 // Include GLEW
 #include <GL/glew.h>
@@ -211,6 +212,43 @@ int main(void)
     glUseProgram(programID);
     glUniform3f(colorUniform, 0.0f, 1.0f, 0.0f);
 
+	/********************/
+	/*Load in orb object*/
+	/********************/
+	// Read our .obj file
+	std::vector<glm::vec3> orb_vertices;
+	std::vector<glm::vec2> orb_uvs;
+	std::vector<glm::vec3> orb_normals;
+	bool orb_res = loadOBJ("mpm_vol.08_p16.OBJ", orb_vertices, orb_uvs, orb_normals);
+
+	std::vector<unsigned short> orb_indices;
+	std::vector<glm::vec3> orb_indexed_vertices;
+	std::vector<glm::vec2> orb_indexed_uvs;
+	std::vector<glm::vec3> orb_indexed_normals;
+	indexVBO(orb_vertices, orb_uvs, orb_normals, orb_indices, orb_indexed_vertices, orb_indexed_uvs, orb_indexed_normals);
+
+	// Load it into a VBO - Vertex data stored in GPU memory
+	GLuint orb_vertexbuffer;
+	glGenBuffers(1, &orb_vertexbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, orb_vertexbuffer);
+	glBufferData(GL_ARRAY_BUFFER, orb_indexed_vertices.size() * sizeof(glm::vec3), &orb_indexed_vertices[0], GL_STATIC_DRAW);
+
+	GLuint orb_uvbuffer;
+	glGenBuffers(1, &orb_uvbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, orb_uvbuffer);
+	glBufferData(GL_ARRAY_BUFFER, orb_indexed_uvs.size() * sizeof(glm::vec2), &orb_indexed_uvs[0], GL_STATIC_DRAW);
+
+	GLuint orb_normalbuffer;
+	glGenBuffers(1, &orb_normalbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, orb_normalbuffer);
+	glBufferData(GL_ARRAY_BUFFER, orb_indexed_normals.size() * sizeof(glm::vec3), &orb_indexed_normals[0], GL_STATIC_DRAW);
+
+	// Generate a buffer for the indices as well
+	GLuint orb_elementbuffer;
+	glGenBuffers(1, &orb_elementbuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, orb_elementbuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, orb_indices.size() * sizeof(unsigned short), &orb_indices[0] , GL_STATIC_DRAW);
+
     // storing all the uavs
     std::vector<std::unique_ptr<ECE_UAV>> uavs;
     // where they will need to be spawned
@@ -311,10 +349,13 @@ int main(void)
         {
             for (size_t j = i + 1; j < uavs.size(); j++)
             {
-                if (uavs[i] -> distanceTo(*uavs[j]) < 0.25f)
+                if (uavs[i] -> distanceTo(*uavs[j]) < 0.01f)
                 {
-                    uavs[i] -> setVelocity(uavs[j] -> getVelocity());
-                    uavs[j] -> setVelocity(const std::array<float, 3> &velocity)
+                    std::cout << i << " Velocity before collision: " << uavs[i] -> getVelMag() << std::endl ;
+                    std::cout << j << " Velocity before collision: " << uavs[j] -> getVelMag() << std::endl ;
+                    uavs[i] -> swapVelocity(*uavs[j]);
+                    std::cout <<  i << " Velocity after collision: " << uavs[i] -> getVelMag() << std::endl ;
+                    std::cout <<  j << " Velocity after collision: " << uavs[j] -> getVelMag() << std::endl ;
                 }
             }
         }
@@ -354,7 +395,34 @@ int main(void)
 
         // }
         // 5) Render the rectangle
-        {
+		// Render our orb
+            // 1) Set uColor to green
+            glUseProgram(programID);
+            glUniform3f(colorUniform, 1.0f, 1.0f, 0.5f);	//Set emissiv color
+
+			// Position at middle, scale large
+			glm::mat4 ModelMatrixOrb = glm::mat4(1.0);
+			ModelMatrixOrb = glm::translate(ModelMatrixOrb, glm::vec3(0.0f, 50.0f, 0.0f));
+			glm::mat4 MVPOrb = ProjectionMatrix * ViewMatrix * ModelMatrixOrb;
+			glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVPOrb[0][0]);
+			glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrixOrb[0][0]);
+
+			// Bind sphere buffers
+			glEnableVertexAttribArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, orb_vertexbuffer);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+			glEnableVertexAttribArray(1);
+			glBindBuffer(GL_ARRAY_BUFFER, orb_uvbuffer);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+			glEnableVertexAttribArray(2);
+			glBindBuffer(GL_ARRAY_BUFFER, orb_normalbuffer);
+			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, orb_elementbuffer);
+			glDrawElements(GL_TRIANGLES, orb_indices.size(), GL_UNSIGNED_SHORT, (void*)0);
+		// 5) Render the rectangle
             // 1) Set uColor to green
             glUseProgram(programID);
             glUniform3f(colorUniform, 0.0f, 1.0f, 0.0f);
@@ -390,8 +458,6 @@ int main(void)
             glDisable(GL_CULL_FACE);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glEnable(GL_CULL_FACE);
-        }
-
         // 6) Update lighting as needed based on user input
         glUniform1i(lightingUniform, getLightingStatus());
 

@@ -176,6 +176,7 @@ add_custom_command(
    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_SOURCE_DIR}/buzzy_bowl/ff.bmp" "${CMAKE_CURRENT_BINARY_DIR}"
    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_SOURCE_DIR}/buzzy_bowl/suzanne.obj" "${CMAKE_CURRENT_BINARY_DIR}"
    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_SOURCE_DIR}/buzzy_bowl/uvmap.DDS" "${CMAKE_CURRENT_BINARY_DIR}"
+   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_SOURCE_DIR}/buzzy_bowl/mpm_vol.08_p16.OBJ" "${CMAKE_CURRENT_BINARY_DIR}"
 )
 elseif (${CMAKE_GENERATOR} MATCHES "Xcode" )
 

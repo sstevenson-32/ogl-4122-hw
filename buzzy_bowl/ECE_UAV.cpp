@@ -11,15 +11,12 @@ void threadFunction(ECE_UAV* pUAV) { pUAV->physicsLoop(); }
 ECE_UAV::ECE_UAV(const std::array<float, 3>& position)
 {
     m_position     = position;
-    m_velocity     = {0.0f, 0.0f, 0.0f};
-    m_acceleration = {0.0f, 0.0f, 0.0f};
+    m_velocity     = { 0.0f, 0.0f, 0.0f };
+    m_acceleration = { 0.0f, 0.0f, 0.0f };
     m_state        = ECE_UAV::UAVState::WAITING;
 }
 
-ECE_UAV::~ECE_UAV()
-{
-    stop();
-}
+ECE_UAV::~ECE_UAV() { stop(); }
 
 // accesor methods
 std::array<float, 3> ECE_UAV::getPosition() const
@@ -28,7 +25,7 @@ std::array<float, 3> ECE_UAV::getPosition() const
     return m_position;
 }
 
-std::array<float, 3> ECE_UAV::getVelocity() const 
+std::array<float, 3> ECE_UAV::getVelocity() const
 {
     std::lock_guard<std::mutex> lock(m_kinematicsMutex);
     return m_velocity;
@@ -36,6 +33,7 @@ std::array<float, 3> ECE_UAV::getVelocity() const
 
 void ECE_UAV::swapVelocity(ECE_UAV& otherUAV)
 {
+    std::lock_guard<std::mutex> lock(m_kinematicsMutex);
     std::swap(m_velocity, otherUAV.m_velocity);
 }
 
@@ -64,7 +62,8 @@ float ECE_UAV::distanceTo(const ECE_UAV& otherUAV) const
 {
     return std::sqrt(std::pow(m_position[0] - otherUAV.m_position[0], 2)
                      + std::pow(m_position[1] - otherUAV.m_position[1], 2)
-                     + std::pow(m_position[2] - otherUAV.m_position[2], 2));
+                     + std::pow(m_position[2] - otherUAV.m_position[2], 2))
+           - (2 * UAVRADIUS);
 }
 
 std::array<float, 3> ECE_UAV::calculateOrbitForce()
@@ -93,8 +92,10 @@ std::array<float, 3> ECE_UAV::calculateOrbitForce()
         m_pidIntegral += error * DELTAT;
     }
 
-    if (m_pidIntegral > 5.0f) m_pidIntegral = 5.0f;
-    if (m_pidIntegral < -5.0f) m_pidIntegral = -5.0f;
+    if (m_pidIntegral > 5.0f)
+        m_pidIntegral = 5.0f;
+    if (m_pidIntegral < -5.0f)
+        m_pidIntegral = -5.0f;
 
     float i_term = m_Ki * m_pidIntegral;
 
@@ -142,17 +143,17 @@ void ECE_UAV::physicsLoop()
                     std::array<float, 3> seekForce = calculateSeekForce(SPHERE_CENTER, 2.0f);
 
                     float kp_launch = 20.0f;
-                    uavForce[0] = seekForce[0] * kp_launch;
-                    uavForce[1] = seekForce[1] * kp_launch;
-                    uavForce[2] = seekForce[2] * kp_launch;
+                    uavForce[0]     = seekForce[0] * kp_launch;
+                    uavForce[1]     = seekForce[1] * kp_launch;
+                    uavForce[2]     = seekForce[2] * kp_launch;
 
-                    uavForce[2] += 10; // compensate for the gravity
+                    uavForce[2] += 10;  // compensate for the gravity
 
                     if (distance <= SPHERERADIUS)
                     {
                         m_state          = ECE_UAV::UAVState::ORBITING;
                         m_orbitEntryTime = std::chrono::high_resolution_clock::now();
-                        m_velocity = {0, 0, 0}; // reset the velocity
+                        m_velocity       = { 0, 0, 0 };  // reset the velocity
                     }
                     break;
                 }
@@ -181,9 +182,9 @@ void ECE_UAV::physicsLoop()
                 case ECE_UAV::UAVState::DONE:
                 {
                     std::cout << "done" << std::endl;
-                    uavForce = { 0.0f, 0.0f, 0.0f };
-                    m_velocity = {0.0f, 0.0f, 0.0f};
-                    m_acceleration = {0.0f, 0.0f, 0.0f};
+                    uavForce       = { 0.0f, 0.0f, 0.0f };
+                    m_velocity     = { 0.0f, 0.0f, 0.0f };
+                    m_acceleration = { 0.0f, 0.0f, 0.0f };
                     break;
                 }
             }
@@ -193,7 +194,7 @@ void ECE_UAV::physicsLoop()
                 applyKinematics(uavForce);
             }
 
-            auto frameEndTime = std::chrono::high_resolution_clock::now();
+            auto                         frameEndTime  = std::chrono::high_resolution_clock::now();
             std::chrono::duration<float> frameDuration = frameEndTime - frameStartTime;
             if (frameDuration.count() < DELTAT)
             {
@@ -257,9 +258,9 @@ std::array<float, 3> ECE_UAV::clampMagnitude(std::array<float, 3> v, float maxMa
     if (vMag > maxMag && vMag > 0.001f)
     {
         float scaleFactor = maxMag / vMag;
-        v[0] = v[0] * scaleFactor;
-        v[1] = v[1] * scaleFactor;
-        v[2] = v[2] * scaleFactor;
+        v[0]              = v[0] * scaleFactor;
+        v[1]              = v[1] * scaleFactor;
+        v[2]              = v[2] * scaleFactor;
     }
     return v;
 }
