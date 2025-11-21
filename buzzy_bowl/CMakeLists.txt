@@ -20,7 +20,13 @@ find_package(Threads REQUIRED)
 
 # Define the executable Replace 'main.cpp' with 'test_main.cpp' if you are
 # running the test script
-add_executable(UAV_Sim main.cpp ECE_UAV.cpp ECE_UAV.h 	../common/shader.cpp
+add_executable(
+	UAV_Sim
+	main.cpp
+	ECE_UAV.cpp
+	ECE_UAV.h
+	
+	../common/shader.cpp
 	../common/shader.hpp
 	../common/controls.cpp
 	../common/controls.hpp

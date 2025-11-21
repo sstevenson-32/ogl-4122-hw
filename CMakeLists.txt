@@ -129,6 +129,9 @@ create_target_launcher(tutorial09_several_objects WORKING_DIRECTORY "${CMAKE_CUR
 # Buzzy Bowl
 add_executable(buzzy_bowl
 	buzzy_bowl/buzzy_bowl.cpp
+	buzzy_bowl/ECE_UAV.cpp
+	buzzy_bowl/ECE_UAV.h
+
 	common/shader.cpp
 	common/shader.hpp
 	common/controls.cpp
@@ -175,7 +178,6 @@ add_custom_command(
    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_SOURCE_DIR}/buzzy_bowl/ff.bmp" "${CMAKE_CURRENT_BINARY_DIR}"
    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_SOURCE_DIR}/buzzy_bowl/suzanne.obj" "${CMAKE_CURRENT_BINARY_DIR}"
    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_SOURCE_DIR}/buzzy_bowl/uvmap.DDS" "${CMAKE_CURRENT_BINARY_DIR}"
-   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_SOURCE_DIR}/buzzy_bowl/mpm_vol.08_p16.OBJ" "${CMAKE_CURRENT_BINARY_DIR}"
 )
 elseif (${CMAKE_GENERATOR} MATCHES "Xcode" )
 
