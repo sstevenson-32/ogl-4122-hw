@@ -43,7 +43,6 @@ if(__create_launchers)
 	return()
 endif()
 set(__create_launchers YES)
-
 include(CleanDirectoryList)
 
 # We must run the following at "include" time, not at function call time,
@@ -263,9 +262,7 @@ macro(_launcher_create_target_launcher)
 		endforeach()
 	else()
 		# Single-config generator - single launcher
-		get_target_property(USERFILE_COMMAND
-			${_targetname}
-			LOCATION)
+        set(USERFILE_COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${_targetname}")
 		file(TO_NATIVE_PATH
 			"${USERFILE_COMMAND}"
 			USERFILE_COMMAND)
