@@ -37,6 +37,10 @@ public:
 
     // float distanceToCenter() const;
     float getForceMag() const;  // return the magnitude of the force vector
+                                //
+    std::array<float, 3> getVelocity()const;
+
+    void swapVelocity(ECE_UAV& otherUAV);
 
     // used for elastic collisions
     void  setVelocity(const std::array<float, 3>& velocity);  // set m_position to this array;
@@ -54,6 +58,7 @@ private:
     const float MAXFORCE          = 20.0;
     const float GRAVITY           = -10.0;
     const float DELTAT            = 0.10;
+    const float UAVRADIUS         = 0.5f;
 
     const std::array<float, 3> SPHERE_CENTER = {0.0f, 0.0f, 50.0f};
     const float SPHERERADIUS = 10.0f;

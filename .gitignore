@@ -22,3 +22,9 @@ OpenGL-tutorial_v*
 .DS_Store
 out/*
 .vs/*
+buzzy_bowl/build*
+buzzy_bowl/.clangd*
+buzzy_bowl/.cache*
+buzzy_bowl/.clang-format*
+buzzy_bowl/CMakeLists.txt*
+

@@ -1,0 +1,44 @@
+[
+{
+  "directory": "/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/build",
+  "command": "/usr/bin/c++  -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/AntTweakBar-1.16/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glfw-3.1.2/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glm-0.9.7.1 -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glew-1.13.0/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/assimp-3.0.1270/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/bullet-2.81-rev2613/src -std=gnu++17 -o CMakeFiles/UAV_Sim.dir/main.cpp.o -c /home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/main.cpp",
+  "file": "/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/main.cpp",
+  "output": "CMakeFiles/UAV_Sim.dir/main.cpp.o"
+},
+{
+  "directory": "/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/build",
+  "command": "/usr/bin/c++  -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/AntTweakBar-1.16/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glfw-3.1.2/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glm-0.9.7.1 -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glew-1.13.0/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/assimp-3.0.1270/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/bullet-2.81-rev2613/src -std=gnu++17 -o CMakeFiles/UAV_Sim.dir/ECE_UAV.cpp.o -c /home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/ECE_UAV.cpp",
+  "file": "/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/ECE_UAV.cpp",
+  "output": "CMakeFiles/UAV_Sim.dir/ECE_UAV.cpp.o"
+},
+{
+  "directory": "/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/build",
+  "command": "/usr/bin/c++  -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/AntTweakBar-1.16/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glfw-3.1.2/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glm-0.9.7.1 -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glew-1.13.0/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/assimp-3.0.1270/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/bullet-2.81-rev2613/src -std=gnu++17 -o CMakeFiles/UAV_Sim.dir/home/aaron/Documents/School/4122/ogl-4122-hw/common/shader.cpp.o -c /home/aaron/Documents/School/4122/ogl-4122-hw/common/shader.cpp",
+  "file": "/home/aaron/Documents/School/4122/ogl-4122-hw/common/shader.cpp",
+  "output": "CMakeFiles/UAV_Sim.dir/home/aaron/Documents/School/4122/ogl-4122-hw/common/shader.cpp.o"
+},
+{
+  "directory": "/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/build",
+  "command": "/usr/bin/c++  -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/AntTweakBar-1.16/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glfw-3.1.2/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glm-0.9.7.1 -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glew-1.13.0/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/assimp-3.0.1270/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/bullet-2.81-rev2613/src -std=gnu++17 -o CMakeFiles/UAV_Sim.dir/home/aaron/Documents/School/4122/ogl-4122-hw/common/controls.cpp.o -c /home/aaron/Documents/School/4122/ogl-4122-hw/common/controls.cpp",
+  "file": "/home/aaron/Documents/School/4122/ogl-4122-hw/common/controls.cpp",
+  "output": "CMakeFiles/UAV_Sim.dir/home/aaron/Documents/School/4122/ogl-4122-hw/common/controls.cpp.o"
+},
+{
+  "directory": "/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/build",
+  "command": "/usr/bin/c++  -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/AntTweakBar-1.16/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glfw-3.1.2/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glm-0.9.7.1 -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glew-1.13.0/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/assimp-3.0.1270/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/bullet-2.81-rev2613/src -std=gnu++17 -o CMakeFiles/UAV_Sim.dir/home/aaron/Documents/School/4122/ogl-4122-hw/common/texture.cpp.o -c /home/aaron/Documents/School/4122/ogl-4122-hw/common/texture.cpp",
+  "file": "/home/aaron/Documents/School/4122/ogl-4122-hw/common/texture.cpp",
+  "output": "CMakeFiles/UAV_Sim.dir/home/aaron/Documents/School/4122/ogl-4122-hw/common/texture.cpp.o"
+},
+{
+  "directory": "/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/build",
+  "command": "/usr/bin/c++  -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/AntTweakBar-1.16/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glfw-3.1.2/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glm-0.9.7.1 -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glew-1.13.0/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/assimp-3.0.1270/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/bullet-2.81-rev2613/src -std=gnu++17 -o CMakeFiles/UAV_Sim.dir/home/aaron/Documents/School/4122/ogl-4122-hw/common/objloader.cpp.o -c /home/aaron/Documents/School/4122/ogl-4122-hw/common/objloader.cpp",
+  "file": "/home/aaron/Documents/School/4122/ogl-4122-hw/common/objloader.cpp",
+  "output": "CMakeFiles/UAV_Sim.dir/home/aaron/Documents/School/4122/ogl-4122-hw/common/objloader.cpp.o"
+},
+{
+  "directory": "/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/build",
+  "command": "/usr/bin/c++  -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/AntTweakBar-1.16/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glfw-3.1.2/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glm-0.9.7.1 -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/glew-1.13.0/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/assimp-3.0.1270/include -I/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/../external/bullet-2.81-rev2613/src -std=gnu++17 -o CMakeFiles/UAV_Sim.dir/home/aaron/Documents/School/4122/ogl-4122-hw/common/vboindexer.cpp.o -c /home/aaron/Documents/School/4122/ogl-4122-hw/common/vboindexer.cpp",
+  "file": "/home/aaron/Documents/School/4122/ogl-4122-hw/common/vboindexer.cpp",
+  "output": "CMakeFiles/UAV_Sim.dir/home/aaron/Documents/School/4122/ogl-4122-hw/common/vboindexer.cpp.o"
+}
+]
