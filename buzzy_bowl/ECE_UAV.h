@@ -1,3 +1,12 @@
+/*
+Author: Aaron Marlin, Samir Stevenson
+Class: ECE4122
+Last Date Modified:
+
+Description:
+Header file describing the ECE_UAV class for the buzzy_bowl simulation
+*/
+
 #include <array>
 #include <chrono>
 #include <thread>
