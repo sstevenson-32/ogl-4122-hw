@@ -304,7 +304,6 @@ int main(void)
 		// glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]); // This one doesn't change between objects, so this can be done once for all objects that use "programID"
         // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-// >>>>>>> b4bf57ffaf197ba00bb76208be8f6aebbf5f27a8
 
         // 1) Compute the MVP matrix from keyboard and mouse input
         computeMatricesFromInputs();
@@ -373,42 +372,7 @@ int main(void)
                 }
             }
         }
-        // for (float angleDegrees = 0.0f; angleDegrees <= 360.0f; angleDegrees += 45.0f) {
-        // 1) Set Model and MVP matrices
-        //          glm::mat4 ModelMatrix = glm::mat4(1.0);
-        // float angle = glm::radians(angleDegrees);
-        // ModelMatrix = glm::translate(ModelMatrix,
-        // glm::vec3(3.5*glm::sin(angle), 1.0f, 3.5*glm::cos(angle))); ModelMatrix =
-        // glm::rotate(ModelMatrix, angle, glm::vec3(0.0f, 1.0f, 0.0f)); glm::mat4 MVP =
-        // ProjectionMatrix * ViewMatrix * ModelMatrix;
 
-        // Send our transformation to the currently bound shader, in the "MVP" uniform
-        // glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-        // glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
-        //
-        // // 1st attribute buffer : vertices
-        // glEnableVertexAttribArray(0);
-        // glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-        // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-        //
-        // // 2nd attribute buffer : UVs
-        // glEnableVertexAttribArray(1);
-        // glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-        // glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-        //
-        // // 3rd attribute buffer : normals
-        // glEnableVertexAttribArray(2);
-        // glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
-        // glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-        //
-        // // 2) Index buffer
-        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-        //
-        // // 3) Draw the triangles !
-        // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, (void*)0);
-
-        // }
-        // 5) Render the rectangle
 		// Render our orb
         {
             // 1) Set uColor to green
@@ -417,9 +381,9 @@ int main(void)
 
 			// Position at middle, scale large
 			glm::mat4 ModelMatrixOrb = glm::mat4(1.0);
-			float scale = 5.0f;
+			ModelMatrixOrb = glm::translate(ModelMatrixOrb, glm::vec3(0.0f, 40.0f, 0.0f));
+			float scale = 3.5f;
 			ModelMatrixOrb = glm::scale(ModelMatrixOrb, glm::vec3(scale, scale, scale));
-			ModelMatrixOrb = glm::translate(ModelMatrixOrb, glm::vec3(0.0f, 10.0f, 0.0f));
 			glm::mat4 MVPOrb = ProjectionMatrix * ViewMatrix * ModelMatrixOrb;
 			glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVPOrb[0][0]);
 			glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrixOrb[0][0]);
