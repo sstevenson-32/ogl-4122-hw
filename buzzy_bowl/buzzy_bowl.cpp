@@ -138,7 +138,7 @@ int main(void)
     indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
 
     // 11) Create and upload VBOs and index buffer - Loading .obj into GPU memory
-    // Load it into a VBO - Vertex data stored in GPU memory
+    // Load it into 5 VBO - Vertex data stored in GPU memory
     GLuint vertexbuffer;
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -216,42 +216,42 @@ int main(void)
 	/*Load in orb object*/
 	/********************/
 	// Read our .obj file
-	std::vector<glm::vec3> orb_vertices;
-	std::vector<glm::vec2> orb_uvs;
-	std::vector<glm::vec3> orb_normals;
-	// bool orb_res = loadOBJ("mpm_vol.08_p16.OBJ", orb_vertices, orb_uvs, orb_normals);
-	bool orb_res = loadOBJ("suzanne.obj", orb_vertices, orb_uvs, orb_normals);
-
-	std::vector<unsigned short> orb_indices;
-	std::vector<glm::vec3> orb_indexed_vertices;
-	std::vector<glm::vec2> orb_indexed_uvs;
-	std::vector<glm::vec3> orb_indexed_normals;
-	indexVBO(orb_vertices, orb_uvs, orb_normals, orb_indices, orb_indexed_vertices, orb_indexed_uvs, orb_indexed_normals);
-	for (auto& n : orb_indexed_normals) {
-		n = -n;
-	}
-
-	// Load it into a VBO - Vertex data stored in GPU memory
-	GLuint orb_vertexbuffer;
-	glGenBuffers(1, &orb_vertexbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, orb_vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, orb_indexed_vertices.size() * sizeof(glm::vec3), &orb_indexed_vertices[0], GL_STATIC_DRAW);
-
-	GLuint orb_uvbuffer;
-	glGenBuffers(1, &orb_uvbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, orb_uvbuffer);
-	glBufferData(GL_ARRAY_BUFFER, orb_indexed_uvs.size() * sizeof(glm::vec2), &orb_indexed_uvs[0], GL_STATIC_DRAW);
-
-	GLuint orb_normalbuffer;
-	glGenBuffers(1, &orb_normalbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, orb_normalbuffer);
-	glBufferData(GL_ARRAY_BUFFER, orb_indexed_normals.size() * sizeof(glm::vec3), &orb_indexed_normals[0], GL_STATIC_DRAW);
-
-	// Generate a buffer for the indices as well
-	GLuint orb_elementbuffer;
-	glGenBuffers(1, &orb_elementbuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, orb_elementbuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, orb_indices.size() * sizeof(unsigned short), &orb_indices[0] , GL_STATIC_DRAW);
+	// // std::vector<glm::vec3> orb_vertices;
+	// // std::vector<glm::vec2> orb_uvs;
+	// // std::vector<glm::vec3> orb_normals;
+	// // // bool orb_res = loadOBJ("mpm_vol.08_p16.OBJ", orb_vertices, orb_uvs, orb_normals);
+	// // bool orb_res = loadOBJ("suzanne.obj", orb_vertices, orb_uvs, orb_normals);
+	//
+	// // std::vector<unsigned short> orb_indices;
+	// // std::vector<glm::vec3> orb_indexed_vertices;
+	// // std::vector<glm::vec2> orb_indexed_uvs;
+	// // std::vector<glm::vec3> orb_indexed_normals;
+	// indexVBO(orb_vertices, orb_uvs, orb_normals, orb_indices, orb_indexed_vertices, orb_indexed_uvs, orb_indexed_normals);
+	// for (auto& n : orb_indexed_normals) {
+	// 	n = -n;
+	// }
+	//
+	// // Load it into a VBO - Vertex data stored in GPU memory
+	// GLuint orb_vertexbuffer;
+	// glGenBuffers(1, &orb_vertexbuffer);
+	// glBindBuffer(GL_ARRAY_BUFFER, orb_vertexbuffer);
+	// glBufferData(GL_ARRAY_BUFFER, orb_indexed_vertices.size() * sizeof(glm::vec3), &orb_indexed_vertices[0], GL_STATIC_DRAW);
+	//
+	// GLuint orb_uvbuffer;
+	// glGenBuffers(1, &orb_uvbuffer);
+	// glBindBuffer(GL_ARRAY_BUFFER, orb_uvbuffer);
+	// glBufferData(GL_ARRAY_BUFFER, orb_indexed_uvs.size() * sizeof(glm::vec2), &orb_indexed_uvs[0], GL_STATIC_DRAW);
+	//
+	// GLuint orb_normalbuffer;
+	// glGenBuffers(1, &orb_normalbuffer);
+	// glBindBuffer(GL_ARRAY_BUFFER, orb_normalbuffer);
+	// glBufferData(GL_ARRAY_BUFFER, orb_indexed_normals.size() * sizeof(glm::vec3), &orb_indexed_normals[0], GL_STATIC_DRAW);
+	//
+	// // Generate a buffer for the indices as well
+	// GLuint orb_elementbuffer;
+	// glGenBuffers(1, &orb_elementbuffer);
+	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, orb_elementbuffer);
+	// glBufferData(GL_ELEMENT_ARRAY_BUFFER, orb_indices.size() * sizeof(unsigned short), &orb_indices[0] , GL_STATIC_DRAW);
 
 	/********************/
 	/*	  Setup UAVs	*/
@@ -381,8 +381,8 @@ int main(void)
 
 			// Position at middle, scale large
 			glm::mat4 ModelMatrixOrb = glm::mat4(1.0);
-			ModelMatrixOrb = glm::translate(ModelMatrixOrb, glm::vec3(0.0f, 40.0f, 0.0f));
-			float scale = 3.5f;
+			ModelMatrixOrb = glm::translate(ModelMatrixOrb, glm::vec3(0.0f, 50.0f, 0.0f));
+			float scale = 9.0f;
 			ModelMatrixOrb = glm::scale(ModelMatrixOrb, glm::vec3(scale, scale, scale));
 			glm::mat4 MVPOrb = ProjectionMatrix * ViewMatrix * ModelMatrixOrb;
 			glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVPOrb[0][0]);
@@ -390,19 +390,19 @@ int main(void)
 
 			// Bind sphere buffers
 			glEnableVertexAttribArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, orb_vertexbuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 			glEnableVertexAttribArray(1);
-			glBindBuffer(GL_ARRAY_BUFFER, orb_uvbuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 			glEnableVertexAttribArray(2);
-			glBindBuffer(GL_ARRAY_BUFFER, orb_normalbuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
 			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, orb_elementbuffer);
-			glDrawElements(GL_TRIANGLES, orb_indices.size(), GL_UNSIGNED_SHORT, (void*)0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, (void*)0);
         }
 		// 5) Render the rectangle
         {

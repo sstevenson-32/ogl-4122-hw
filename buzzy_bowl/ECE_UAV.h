@@ -1,3 +1,12 @@
+/*
+Author: Aaron Marlin, Samir Stevenson
+Class: ECE4122
+Last Date Modified:
+
+Description:
+Header file describing the ECE_UAV class for the buzzy_bowl simulation
+*/
+
 #include <array>
 #include <chrono>
 #include <thread>
@@ -57,7 +66,7 @@ private:
     const float COLLISIONCONSTANT = 1.0;
     const float MAXFORCE          = 20.0;
     const float GRAVITY           = -10.0;
-    const float DELTAT            = 0.10;
+    const float DELTAT            = 0.01f;
     const float UAVRADIUS         = 0.5f;
 
     const std::array<float, 3> SPHERE_CENTER = {0.0f, 0.0f, 50.0f};
@@ -73,6 +82,7 @@ private:
     std::array<float, 3> m_position;
     std::array<float, 3> m_velocity;
     std::array<float, 3> m_acceleration;
+    std::array<float, 3> m_randTarget = {1.0f, 0.0f, 0.0f}; 
 
 
     std::thread           m_movement;

@@ -7,6 +7,7 @@ Description:
 Implementation of the ECE_UAV class for the buzzy_bowl simulation
 */
 #include "ECE_UAV.h"
+#include <exception>
 #include <iostream>
 #include <chrono>
 #include <cmath>
@@ -122,8 +123,10 @@ std::array<float, 3> ECE_UAV::calculateOrbitForce()
     }
 
     // calculate the PID
-    float error  = SPHERERADIUS - currentDistance;
-    float p_term = m_Kp * error;
+    float error = SPHERERADIUS - currentDistance;
+
+    float effectiveKp = (error > 0) ? (m_Kp * 5.0f) : m_Kp;
+    float p_term      = effectiveKp * error;
 
     // P portion of PID
     if (std::abs(error) < 2.0f)
@@ -199,6 +202,15 @@ void ECE_UAV::physicsLoop()
                 {
                     // calculate the distance to the sphere
                     float distance = this->distanceToSphereCenter();
+                    if (distance <= SPHERERADIUS)
+                    {
+                        m_state          = ECE_UAV::UAVState::ORBITING;
+                        m_orbitEntryTime = std::chrono::high_resolution_clock::now();
+                        m_velocity       = { 0, 0, 0 };
+                        uavForce         = { 0, 0, 0 };
+                        continue;
+                    }
+
                     // calculate the force to move towards the center
                     std::array<float, 3> seekForce = calculateSeekForce(SPHERE_CENTER, 2.0f);
 
@@ -207,49 +219,97 @@ void ECE_UAV::physicsLoop()
                     uavForce[0]     = seekForce[0] * kp_launch;
                     uavForce[1]     = seekForce[1] * kp_launch;
                     uavForce[2]     = seekForce[2] * kp_launch;
-
-                    // account for gravity in the Y plane
                     uavForce[2] += 10;  // compensate for the gravity
 
-                    // if we've reached the 10m radius of the sphere, we can start orbiting and
-                    // reset the velocity
-                    if (distance <= SPHERERADIUS)
-                    {
-                        // start orbiting
-                        m_state = ECE_UAV::UAVState::ORBITING;
-                        // keep track of the time we start orbiting to count to 60s
-                        m_orbitEntryTime = std::chrono::high_resolution_clock::now();
-                        m_velocity       = { 0, 0, 0 };  // reset the velocity
-                    }
                     break;
                 }
                 // if we are in the orbiting state
                 case ECE_UAV::UAVState::ORBITING:
                 {
+                    std::array<float, 3> fromCenter = { m_position[0] - SPHERE_CENTER[0],
+                                                        m_position[1] - SPHERE_CENTER[1],
+                                                        m_position[2] - SPHERE_CENTER[2] };
+
+                    // determning the magnitude of that vector
+                    float dist
+                        = std::sqrt(fromCenter[0] * fromCenter[0] + fromCenter[1] * fromCenter[1]
+                                    + fromCenter[2] * fromCenter[2]);
+
+                    if (dist < SPHERERADIUS && dist > 0.01f)
+                    {
+                        float nx = fromCenter[0] / dist;
+                        float ny = fromCenter[1] / dist;
+                        float nz = fromCenter[2] / dist;
+
+                        float vDotN = m_velocity[0] * nx + m_velocity[1] * ny + m_velocity[2] * nz;
+                        if (vDotN < 0)
+                        {
+                            m_velocity[0] -= vDotN * nx;
+                            m_velocity[1] -= vDotN * ny;
+                            m_velocity[2] -= vDotN * nz;
+                        }
+                    }
                     // calculate the force for orbiting the sphere
-                    std::array<float, 3> radialForce     = calculateOrbitForce();
+                    std::array<float, 3> radialForce = calculateOrbitForce();
+
+                    m_randTarget[0] += ((rand() % 100 - 50) / 100.0f) * 0.5f;
+                    m_randTarget[1] += ((rand() % 100 - 50) / 100.0f) * 0.5f;
+                    m_randTarget[2] += ((rand() % 100 - 50) / 100.0f) * 0.5f;
+
+                    float rMag
+                        = std::sqrt(std::pow(m_randTarget[0], 2) + std::pow(m_randTarget[1], 2)
+                                    + std::pow(m_randTarget[2], 2));
+                    if (rMag > 0.01f)
+                    {
+                        m_randTarget[0] /= rMag;
+                        m_randTarget[1] /= rMag;
+                        m_randTarget[2] /= rMag;
+                    }
                     // calculate random force
                     std::array<float, 3> tangentialForce = {
-                        ((rand() % 200 - 100) / 100.0f) * 5.0f,
-                        ((rand() % 200 - 100) / 100.0f) * 5.0f,
-                        ((rand() % 200 - 100) / 100.0f) * 5.0f,
+                        m_randTarget[0] * 10.0f,
+                        m_randTarget[1] * 10.0f,
+                        m_randTarget[2] * 10.0f,
                     };
+                    float                currentSpeed      = getVelMag();
+                    std::array<float, 3> speedControlForce = { 0.0f, 0.0f, 0.0f };
+                    if (currentSpeed < 2.0f)
+                    {
+                        if (currentSpeed > 0.1f)
+                        {
+                            speedControlForce[0] = (m_velocity[0] / currentSpeed) * 10.0f;
+                            speedControlForce[1] = (m_velocity[1] / currentSpeed) * 10.0f;
+                            speedControlForce[2] = (m_velocity[2] / currentSpeed) * 10.0f;
+                        }
+                        else
+                        {
+                            speedControlForce = tangentialForce;
+                        }
+                    }
+                    else if (currentSpeed > 9.0f)
+                    {
+                        float brake          = 2.0f;
+                        speedControlForce[0] = -m_velocity[0] * brake;
+                        speedControlForce[1] = -m_velocity[1] * brake;
+                        speedControlForce[2] = -m_velocity[2] * brake;
+                    }
 
                     // apply the radial force and random force onto the UAV
-                    uavForce[0] = radialForce[0] + tangentialForce[0];
-                    uavForce[1] = radialForce[1] + tangentialForce[1];
-                    uavForce[2] = radialForce[2] + tangentialForce[2];
+                    uavForce[0] = radialForce[0] + tangentialForce[0] + speedControlForce[0];
+                    uavForce[1] = radialForce[1] + tangentialForce[1] + speedControlForce[1];
+                    uavForce[2] = radialForce[2] + tangentialForce[2] + speedControlForce[2]
+                                  + 10;  // account for gravity
 
                     // get the current time
-                    auto currTime      = std::chrono::high_resolution_clock::now();
+                    auto currTime = std::chrono::high_resolution_clock::now();
                     // calculate how long we have been orbiting
                     auto orbitDuration = std::chrono::duration<float>(currTime - m_orbitEntryTime);
                     // if we've been orbiting for 60 seconds we can stop and move to the done phase
                     if (orbitDuration.count() >= 60.0f)
                     {
                         std::cout << "finished physics " << std::endl;
-                        m_state = ECE_UAV::UAVState::DONE;
-                        m_velocity = {0, 0, 0};
+                        m_state    = ECE_UAV::UAVState::DONE;
+                        m_velocity = { 0, 0, 0 };
                     }
                     break;
                 }
@@ -272,10 +332,11 @@ void ECE_UAV::physicsLoop()
             }
 
             // keep track of when this iteration finished
-            auto                         frameEndTime  = std::chrono::high_resolution_clock::now();
+            auto frameEndTime = std::chrono::high_resolution_clock::now();
             // determine the total time of this iteration
             std::chrono::duration<float> frameDuration = frameEndTime - frameStartTime;
-            // if the total time was less than deltat, then we will sleep until deltat has been reached to ensure our threads our synchronized
+            // if the total time was less than deltat, then we will sleep until deltat has been
+            // reached to ensure our threads our synchronized
             if (frameDuration.count() < DELTAT)
             {
                 std::this_thread::sleep_for(
@@ -351,9 +412,9 @@ std::array<float, 3> ECE_UAV::clampMagnitude(std::array<float, 3> force, float m
     {
         // then scale normalize our force
         float scaleFactor = maxMag / fMag;
-        force[0]              = force[0] * scaleFactor;
-        force[1]              = force[1] * scaleFactor;
-        force[2]              = force[2] * scaleFactor;
+        force[0]          = force[0] * scaleFactor;
+        force[1]          = force[1] * scaleFactor;
+        force[2]          = force[2] * scaleFactor;
     }
     return force;
 }
@@ -374,13 +435,20 @@ std::array<float, 3> ECE_UAV::calculateSeekForce(const std::array<float, 3>& tar
     float dist = std::sqrt(std::pow(desiredVelocity[0], 2) + std::pow(desiredVelocity[1], 2)
                            + std::pow(desiredVelocity[2], 2));
 
+    float speed          = maxSpeed;
+    float slowDownRadius = 5.0f;
+    if (dist < slowDownRadius)
+    {
+        speed = maxSpeed * (dist / slowDownRadius);
+    }
+
     // if the distance is positive
     if (dist > 0.001f)
     {
-        // then normalize our desiredVelocity 
-        desiredVelocity[0] = (desiredVelocity[0] / dist) * maxSpeed;
-        desiredVelocity[1] = (desiredVelocity[1] / dist) * maxSpeed;
-        desiredVelocity[2] = (desiredVelocity[2] / dist) * maxSpeed;
+        // then normalize our desiredVelocity
+        desiredVelocity[0] = (desiredVelocity[0] / dist) * speed;
+        desiredVelocity[1] = (desiredVelocity[1] / dist) * speed;
+        desiredVelocity[2] = (desiredVelocity[2] / dist) * speed;
     }
 
     // determine the force we need to reach that desired velocity
