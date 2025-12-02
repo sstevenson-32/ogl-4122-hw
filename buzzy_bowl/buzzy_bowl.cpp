@@ -59,7 +59,7 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // 3) Open a window and create its OpenGL context
-    window = glfwCreateWindow(1024, 768, "Tutorial 09 - Rendering several models", NULL, NULL);
+    window = glfwCreateWindow(1024, 768, "BuzzyBowl", NULL, NULL);
     if (window == NULL)
     {
         fprintf(
@@ -210,7 +210,7 @@ int main(void)
     // Create uniform color shader for the rectangle
     GLuint colorUniform = glGetUniformLocation(programID, "uColor");
     glUseProgram(programID);
-    glUniform3f(colorUniform, 0.0f, 1.0f, 0.0f);
+    glUniform3f(colorUniform, 1.0f, 1.0f, 1.0f);
 
 	/********************/
 	/*Load in orb object*/
@@ -313,7 +313,7 @@ int main(void)
         // 3) Use our shader and set globals to be used by all objects
         // Set light position and view matrix once before drawing objects
         glUseProgram(programID);
-        glm::vec3 lightPos = glm::vec3(4, 4, 4);
+        glm::vec3 lightPos = glm::vec3(0.0f, 50.0f, 0.0f);
         glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
         glUniformMatrix4fv(
             ViewMatrixID,
@@ -335,6 +335,12 @@ int main(void)
             glm::mat4 MVP                    = ProjectionMatrix * ViewMatrix * ModelMatrix;
             glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
             glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
+
+            // Calculate oscillating color intensity (0.5 Hz) - simulates UAV's internal light
+            float frequency = 0.5f;  // Hz
+            float intensity = 0.75f + 0.25f * sin(2.0f * 3.14159f * frequency * currentTime);
+            // intensity oscillates between 0.5 and 1.0 (half to full brightness)
+            glUniform3f(colorUniform, intensity, intensity, intensity);
 
             // 1st attribute buffer : vertices
             glEnableVertexAttribArray(0);
@@ -382,7 +388,7 @@ int main(void)
 			// Position at middle, scale large
 			glm::mat4 ModelMatrixOrb = glm::mat4(1.0);
 			ModelMatrixOrb = glm::translate(ModelMatrixOrb, glm::vec3(0.0f, 50.0f, 0.0f));
-			float scale = 9.0f;
+			float scale = 8.0f;
 			ModelMatrixOrb = glm::scale(ModelMatrixOrb, glm::vec3(scale, scale, scale));
 			glm::mat4 MVPOrb = ProjectionMatrix * ViewMatrix * ModelMatrixOrb;
 			glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVPOrb[0][0]);
@@ -406,9 +412,9 @@ int main(void)
         }
 		// 5) Render the rectangle
         {
-            // 1) Set uColor to green
+            // 1) Set uColor
             glUseProgram(programID);
-            glUniform3f(colorUniform, 0.0f, 1.0f, 0.0f);
+            glUniform3f(colorUniform, 1.0f, 1.0f, 1.0f);
 
             // 2) Bind the texture for our rectangle
             // glBindTexture(GL_TEXTURE_2D, RectTexture);

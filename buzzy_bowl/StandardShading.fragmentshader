@@ -15,13 +15,14 @@ uniform sampler2D myTextureSampler;
 uniform mat4 MV;
 uniform vec3 LightPosition_worldspace;
 uniform int lightingOpts;		//Flag to determine lighting options
+uniform vec3 uColor;			// Color multiplier for oscillating brightness
 
 void main(){
 
 	// Light emission properties
 	// You probably want to put them as uniforms
 	vec3 LightColor = vec3(1,1,1);
-	float LightPower = 100.0f * lightingOpts;
+	float LightPower = 1000.0f * lightingOpts;
 	
 	// Material properties
 	vec3 MaterialDiffuseColor = texture( myTextureSampler, UV ).rgb;
@@ -59,5 +60,8 @@ void main(){
 		MaterialDiffuseColor * LightColor * LightPower * cosTheta / (distance*distance) +
 		// Specular : reflective highlight, like a mirror
 		MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha,5) / (distance*distance);
+
+	// Apply color multiplier for oscillating brightness effect
+	color = color * uColor;
 
 }
