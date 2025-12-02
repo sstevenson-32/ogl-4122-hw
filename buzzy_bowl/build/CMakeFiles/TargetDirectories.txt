@@ -1,3 +1,0 @@
-/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/build/CMakeFiles/UAV_Sim.dir
-/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/build/CMakeFiles/edit_cache.dir
-/home/aaron/Documents/School/4122/ogl-4122-hw/buzzy_bowl/build/CMakeFiles/rebuild_cache.dir
