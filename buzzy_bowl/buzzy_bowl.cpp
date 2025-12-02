@@ -1,9 +1,15 @@
 /*
 Author: Samir Stevenson, Aaron Marlin
 Class: ECE4122
-Last Date Modified:
+Last Date Modified:12/2/2025
 
 Description:
+
+Final project for ECE4122. Extra features added:
+    - L to toggle lighting on and off
+    - UAVs oscillate in their lighting magnitude
+    - ff.bmp placed on football field
+    - Lighting placed within the orb
 */
 
 /*
@@ -19,6 +25,7 @@ cmake --build . --target buzzy_bowl
 #include <stdlib.h>
 #include <vector>
 #include <iostream>
+// #include <cmath>
 
 // Include GLEW
 #include <GL/glew.h>
@@ -39,6 +46,67 @@ using namespace glm;
 #include "../common/vboindexer.hpp"
 
 #include "ECE_UAV.h"
+
+// Helper function to generate a UV sphere
+void generateSphere(float radius, unsigned int latSegments, unsigned int lonSegments,
+                    std::vector<glm::vec3>& vertices,
+                    std::vector<glm::vec2>& uvs,
+                    std::vector<glm::vec3>& normals,
+                    std::vector<unsigned short>& indices)
+{
+    vertices.clear();
+    uvs.clear();
+    normals.clear();
+    indices.clear();
+
+    for (unsigned int lat = 0; lat <= latSegments; ++lat)
+    {
+        float theta = lat * M_PI / latSegments;
+        float sinTheta = sin(theta);
+        float cosTheta = cos(theta);
+
+        for (unsigned int lon = 0; lon <= lonSegments; ++lon)
+        {
+            float phi = lon * 2 * M_PI / lonSegments;
+            float sinPhi = sin(phi);
+            float cosPhi = cos(phi);
+
+            // Position
+            float x = cosPhi * sinTheta;
+            float y = cosTheta;
+            float z = sinPhi * sinTheta;
+
+            vertices.push_back(glm::vec3(radius * x, radius * y, radius * z));
+            // Normal pointing outward
+            normals.push_back(glm::vec3(x, y, z));
+
+            // UV coordinates
+            float u = (float)lon / lonSegments;
+            float v = (float)lat / latSegments;
+            uvs.push_back(glm::vec2(u, v));
+        }
+    }
+
+    // Generate indices with correct winding order (CCW for front faces)
+    for (unsigned int lat = 0; lat < latSegments; ++lat)
+    {
+        for (unsigned int lon = 0; lon < lonSegments; ++lon)
+        {
+            unsigned short first = lat * (lonSegments + 1) + lon;
+            unsigned short second = first + lonSegments + 1;
+
+            // Triangle 1
+            indices.push_back(first);
+            indices.push_back(first + 1);
+            indices.push_back(second);
+
+            // Triangle 2
+            indices.push_back(second);
+            indices.push_back(first + 1);
+            indices.push_back(second + 1);
+        }
+    }
+}
 
 int main(void)
 {
@@ -213,6 +281,41 @@ int main(void)
     glUniform3f(colorUniform, 1.0f, 1.0f, 1.0f);
 
 	/********************/
+	/*  Setup Orb */
+	/********************/
+    // Generate sphere geometry
+    std::vector<glm::vec3> sphere_vertices;
+    std::vector<glm::vec2> sphere_uvs;
+    std::vector<glm::vec3> sphere_normals;
+    std::vector<unsigned short> sphere_indices;
+    generateSphere(1.0f, 32, 64, sphere_vertices, sphere_uvs, sphere_normals, sphere_indices);
+
+    // Create sphere VBOs
+    GLuint sphereVertexBuffer;
+    glGenBuffers(1, &sphereVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, sphereVertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sphere_vertices.size() * sizeof(glm::vec3), &sphere_vertices[0], GL_STATIC_DRAW);
+
+    GLuint sphereUVBuffer;
+    glGenBuffers(1, &sphereUVBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, sphereUVBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sphere_uvs.size() * sizeof(glm::vec2), &sphere_uvs[0], GL_STATIC_DRAW);
+
+    GLuint sphereNormalBuffer;
+    glGenBuffers(1, &sphereNormalBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, sphereNormalBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sphere_normals.size() * sizeof(glm::vec3), &sphere_normals[0], GL_STATIC_DRAW);
+
+    GLuint sphereElementBuffer;
+    glGenBuffers(1, &sphereElementBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereElementBuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphere_indices.size() * sizeof(unsigned short), &sphere_indices[0], GL_STATIC_DRAW);
+    
+    // Store the index count for rendering
+    GLsizei sphereIndexCount = static_cast<GLsizei>(sphere_indices.size());
+    printf("Sphere generated: %zu vertices, %zu indices\n", sphere_vertices.size(), sphere_indices.size());
+
+	/********************/
 	/*	  Setup UAVs	*/
 	/********************/
     std::vector<std::unique_ptr<ECE_UAV>> uavs;
@@ -254,14 +357,6 @@ int main(void)
             lastTime += 1.0;
         }
 
-		// 3) Use our shader and set globals to be used by all objects
-		// Set light position and view matrix once before drawing objects
-		// glUseProgram(programID);
-		// // glm::vec3 lightPos = glm::vec3(4,4,4);
-		// glm::vec3 lightPos = glm::vec3(0.0f, 25.0f, 0.0f);
-		// glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
-		// glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]); // This one doesn't change between objects, so this can be done once for all objects that use "programID"
-        // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // 1) Compute the MVP matrix from keyboard and mouse input
@@ -338,11 +433,19 @@ int main(void)
             }
         }
 
-		// Render our orb
+		// Render our Earth orb
         {
-            // 1) Set uColor to green
+            // 1) Set uColor to white
             glUseProgram(programID);
-            glUniform3f(colorUniform, 1.0f, 1.0f, 0.5f);	//Set emissiv color
+            glUniform3f(colorUniform, 1.0f, 1.0f, 1.0f);
+            
+            // Temporarily boost lighting for the sphere
+            glUniform1i(lightingUniform, 10);
+
+            // 2) Bind texture
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, Texture);
+            glUniform1i(TextureID, 0);
 
 			// Position at middle, scale large
 			glm::mat4 ModelMatrixOrb = glm::mat4(1.0);
@@ -353,21 +456,27 @@ int main(void)
 			glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVPOrb[0][0]);
 			glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrixOrb[0][0]);
 
-			// Bind sphere buffers
+			// Bind sphere buffers (using generated sphere, not Suzanne)
 			glEnableVertexAttribArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, sphereVertexBuffer);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 			glEnableVertexAttribArray(1);
-			glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, sphereUVBuffer);
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 			glEnableVertexAttribArray(2);
-			glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, sphereNormalBuffer);
 			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, (void*)0);
+			// Draw sphere - disable face culling
+			glDisable(GL_CULL_FACE);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereElementBuffer);
+			glDrawElements(GL_TRIANGLES, sphereIndexCount, GL_UNSIGNED_SHORT, (void*)0);
+			glEnable(GL_CULL_FACE);
+			
+			// Restore normal lighting
+			glUniform1i(lightingUniform, getLightingStatus());
         }
 		// 5) Render the rectangle
         {
@@ -428,6 +537,10 @@ int main(void)
     glDeleteBuffers(1, &uvbuffer);
     glDeleteBuffers(1, &normalbuffer);
     glDeleteBuffers(1, &elementbuffer);
+    glDeleteBuffers(1, &sphereVertexBuffer);
+    glDeleteBuffers(1, &sphereUVBuffer);
+    glDeleteBuffers(1, &sphereNormalBuffer);
+    glDeleteBuffers(1, &sphereElementBuffer);
     glDeleteProgram(programID);
     glDeleteTextures(1, &Texture);
     glDeleteVertexArrays(1, &VertexArrayID);
