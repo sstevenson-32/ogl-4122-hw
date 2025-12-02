@@ -37,17 +37,17 @@ public:
 
     // get the position of the uav
     // used for main render loop
-    std::array<float, 3> getPosition()const;
+    std::array<float, 3> getPosition() const;
 
     // check the status of the UAV
     std::atomic<ECE_UAV::UAVState>& getState();
-    bool     isDone() const;  // helper to check if the state of the UAV is DONE
+    bool isDone() const;  // helper to check if the state of the UAV is DONE
 
 
     // float distanceToCenter() const;
     float getForceMag() const;  // return the magnitude of the force vector
                                 //
-    std::array<float, 3> getVelocity()const;
+    std::array<float, 3> getVelocity() const;
 
     void swapVelocity(ECE_UAV& otherUAV);
 
@@ -69,27 +69,27 @@ private:
     const float DELTAT            = 0.01f;
     const float UAVRADIUS         = 0.5f;
 
-    const std::array<float, 3> SPHERE_CENTER = {0.0f, 0.0f, 50.0f};
-    const float SPHERERADIUS = 10.0f;
+    const std::array<float, 3> SPHERE_CENTER = { 0.0f, 0.0f, 50.0f };
+    const float                SPHERERADIUS  = 10.0f;
 
     const float m_Kp = 150.0f;
     const float m_Ki = 20.0f;
     const float m_Kd = 40.0f;
 
-    float m_pidIntegral = 0.0f;
+    float m_pidIntegral      = 0.0f;
     float m_pidPreviousError = 0.0f;
 
     std::array<float, 3> m_position;
     std::array<float, 3> m_velocity;
     std::array<float, 3> m_acceleration;
-    std::array<float, 3> m_randTarget = {1.0f, 0.0f, 0.0f}; 
+    std::array<float, 3> m_randTarget = { 1.0f, 0.0f, 0.0f };
 
 
     std::thread           m_movement;
     std::atomic<bool>     m_isMoving;
     std::atomic<UAVState> m_state;
 
-    mutable std::mutex    m_kinematicsMutex;
+    mutable std::mutex m_kinematicsMutex;
 
     std::chrono::high_resolution_clock::time_point m_startTime;
     std::chrono::high_resolution_clock::time_point m_orbitEntryTime;
