@@ -117,8 +117,8 @@ void computeMatricesFromInputs(){
 	// printf("Position: (%f, %f, %f). Radius: (%f). horizontalAngle: (%f). verticleAngle: (%f).\n", position.x, position.y, position.z, radius, horizontalAngle, verticalAngle);
 
 	// 8) Set view values
-	// Projection matrix : 45� Field of View, 4:3 ratio, display range : 0.1 unit <-> 200 units
-	ProjectionMatrix = glm::perspective(glm::radians(initialFoV), 4.0f / 3.0f, 0.1f, 250.0f);
+	// Projection matrix : 45� Field of View, 4:3 ratio, display range : 0.1 unit <-> 500 units
+	ProjectionMatrix = glm::perspective(glm::radians(initialFoV), 4.0f / 3.0f, 0.1f, 500.0f);
 	// Camera matrix
 	ViewMatrix       = glm::lookAt(
 								position,           // Camera is here
