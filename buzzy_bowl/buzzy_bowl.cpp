@@ -10,6 +10,7 @@ Final project for ECE4122. Extra features added:
     - UAVs oscillate in their lighting magnitude
     - ff.bmp placed on football field
     - Lighting placed within the orb
+    - Orb placed at target with texture uvmap.DDS placed on it
 */
 
 /*
